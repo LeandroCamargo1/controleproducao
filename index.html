@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hokkaido Synchro - Controle de Perdas</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        
+        @keyframes fadeInOut { 0%, 100% { opacity: 0; } 10%, 90% { opacity: 1; } }
+        .fade-in-out { animation: fadeInOut 4s ease-in-out forwards; }
+
+        .tab-btn.active {
+            border-bottom-color: #0891b2; /* cyan-600 */
+            color: #0e7490; /* cyan-700 */
+            font-weight: 600;
+        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+    </style>
+</head>
+<body class="bg-slate-200 text-slate-800">
+
+    <div class="container mx-auto p-4 md:p-6 lg:p-8">
+        
+        <header class="text-center mb-8 w-full">
+            <img src="https://hrukbkrzmabdrjyvpmff.supabase.co/storage/v1/object/public/logos/logo.svg" alt="Logo Hokkaido Plastics" class="mx-auto h-20 w-auto mb-4">
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-900 bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-blue-500">Hokkaido Synchro</h1>
+            <p class="text-lg text-slate-600 font-medium mt-1">Controle de Produção e Perdas</p>
+        </header>
+
+        <div class="mb-6 border-b border-slate-300">
+            <nav class="flex space-x-6">
+                <button class="tab-btn py-3 px-1 text-slate-600 hover:text-cyan-600 border-b-2 border-transparent transition-all duration-300 active" data-tab="lancamento">
+                    <i data-lucide="edit-3" class="w-4 h-4 inline-block mr-2"></i>Lançamento
+                </button>
+                <button class="tab-btn py-3 px-1 text-slate-600 hover:text-cyan-600 border-b-2 border-transparent transition-all duration-300" data-tab="dashboard">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4 inline-block mr-2"></i>Dashboard
+                </button>
+            </nav>
+        </div>
+
+        <div id="tab-content">
+            <div id="lancamento-tab" class="tab-pane active fade-in">
+                <main class="w-full max-w-2xl mx-auto bg-white p-6 md:p-8 rounded-lg shadow-lg border-t-4 border-cyan-500">
+                    <h2 class="text-2xl font-bold mb-4 flex items-center gap-2 text-slate-800 border-b-2 border-slate-100 pb-3"><i data-lucide="edit-3" class="text-cyan-600"></i>Lançamento de Turno</h2>
+                    <form id="production-form" class="space-y-5 pt-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+                            <div>
+                                <label for="operador" class="block text-sm font-medium text-slate-700">Operador</label>
+                                <input type="number" id="operador" name="operador" required placeholder="" class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
+                            </div>
+                            <div>
+                                <label for="maquina" class="block text-sm font-medium text-slate-700">Máquina</label>
+                                <select id="maquina" name="maquina" required class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 transition" disabled>
+                                    <option value="">A carregar máquinas do plano...</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="turno" class="block text-sm font-medium text-slate-700">Turno</label>
+                                <select id="turno" name="turno" required class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
+                                    <option value="1">1º Turno</option>
+                                    <option value="2">2º Turno</option>
+                                    <option value="3">3º Turno</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="op" class="block text-sm font-medium text-slate-700">Produto</label>
+                                <input type="text" id="op" name="produto" required placeholder="Preenchido automaticamente" class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 transition bg-slate-50" readonly>
+                            </div>
+                            <div>
+                                <label for="produzido" class="block text-sm font-medium text-slate-700">Produção</label>
+                                <input type="number" id="produzido" name="produzido" min="0" required class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
+                            </div>
+                             <div>
+                                <label for="triagem" class="block text-sm font-medium text-slate-700">Peças para Triagem</label>
+                                <input type="number" id="triagem" name="triagem" min="0" required value="0" class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
+                            </div>
+                             <div>
+                                <label for="refugo" class="block text-sm font-medium text-slate-700">Refugo (kg)</label>
+                                <input type="number" id="refugo" name="refugo" min="0" step="0.01" required value="0" class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
+                            </div>
+                            <div>
+                                <label for="borras" class="block text-sm font-medium text-slate-700">Peso das Borras (kg)</label>
+                                <input type="number" id="borras" name="borras" min="0" step="0.01" required value="0" class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label for="perdas" class="block text-sm font-medium text-slate-700">Perdas (Motivo do Refugo)</label>
+                                <select id="perdas" name="perdas" required class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
+                                    <option value="N/A">Não se aplica / Sem refugo</option>
+                                    <option value="Falha">Falha</option>
+                                    <option value="Rebarba">Rebarba</option>
+                                    <option value="Sujidade">Sujidade</option>
+                                    <option value="Contaminação">Contaminação</option>
+                                    <option value="Troca de cor">Troca de cor</option>
+                                    <option value="Reinicio de produção">Reinicio de produção</option>
+                                </select>
+                            </div>
+                        </div>
+                        <hr class="border-slate-200 my-4">
+                        <div class="flex flex-col items-center gap-4">
+                            <button type="submit" id="submit-button" class="w-full md:w-auto bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 px-8 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:bg-slate-400 disabled:cursor-not-allowed shadow-sm hover:shadow-md">
+                                <i data-lucide="send" class="w-5 h-5"></i>
+                                <span>Enviar Lançamento</span>
+                            </button>
+                            <div id="status-message" class="text-sm font-semibold h-5 text-center"></div>
+                        </div>
+                    </form>
+                </main>
+            </div>
+
+            <div id="dashboard-tab" class="tab-pane" style="display: none;">
+                 <div class="mb-6 flex flex-col md:flex-row items-center justify-between gap-4 bg-white p-4 rounded-lg shadow-md">
+                    <div class="w-full flex flex-col md:flex-row items-center gap-4">
+                        <div class="flex-1 flex items-center gap-2">
+                            <label for="start-date-selector" class="font-semibold text-slate-700 text-sm md:text-base whitespace-nowrap">De:</label>
+                            <input type="date" id="start-date-selector" class="w-full border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 transition">
+                        </div>
+                        <div class="flex-1 flex items-center gap-2">
+                             <label for="end-date-selector" class="font-semibold text-slate-700 text-sm md:text-base whitespace-nowrap">Até:</label>
+                            <input type="date" id="end-date-selector" class="w-full border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 transition">
+                        </div>
+                    </div>
+                    <button id="refresh-dashboard-btn" class="w-full md:w-auto bg-cyan-600 hover:bg-cyan-700 text-white font-bold p-2 px-6 rounded-lg transition-colors flex items-center justify-center gap-2" title="Atualizar dados do dashboard">
+                        <i data-lucide="search" class="w-5 h-5"></i>
+                        <span>Filtrar</span>
+                    </button>
+                </div>
+
+                <div id="dashboard-content" class="space-y-6" style="display: none;">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="bg-white p-5 rounded-lg shadow-lg flex items-center gap-4">
+                            <div class="p-3 bg-blue-100 rounded-full"><i data-lucide="package" class="w-7 h-7 text-blue-600"></i></div>
+                            <div>
+                                <p class="text-sm text-slate-500">Produção Total</p>
+                                <p id="kpi-producao" class="text-2xl font-bold">...</p>
+                            </div>
+                        </div>
+                         <div class="bg-white p-5 rounded-lg shadow-lg flex items-center gap-4">
+                            <div class="p-3 bg-red-100 rounded-full"><i data-lucide="trash-2" class="w-7 h-7 text-red-600"></i></div>
+                            <div>
+                                <p class="text-sm text-slate-500">Refugo Total (kg)</p>
+                                <p id="kpi-refugo" class="text-2xl font-bold">...</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-5 rounded-lg shadow-lg flex items-center gap-4">
+                            <div class="p-3 bg-purple-100 rounded-full"><i data-lucide="clipboard-check" class="w-7 h-7 text-purple-600"></i></div>
+                            <div>
+                                <p class="text-sm text-slate-500">Total para Triagem</p>
+                                <p id="kpi-triagem" class="text-2xl font-bold">...</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-5 rounded-lg shadow-lg flex items-center gap-4">
+                            <div class="p-3 bg-green-100 rounded-full"><i data-lucide="recycle" class="w-7 h-7 text-green-600"></i></div>
+                            <div>
+                                <p class="text-sm text-slate-500">Borras (kg)</p>
+                                <p id="kpi-borras" class="text-2xl font-bold">...</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-red-500">
+                             <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-800 border-b-2 border-slate-100 pb-3"><i data-lucide="bar-chart-3" class="text-red-500"></i>Principais Motivos de Perdas (Pareto)</h2>
+                            <canvas id="refugoChart"></canvas>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-blue-500">
+                            <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-800 border-b-2 border-slate-100 pb-3"><i data-lucide="bar-chart-horizontal" class="text-blue-500"></i>Análise de Perdas por Turno (kg)</h2>
+                             <canvas id="turnoChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                 <div id="dashboard-loading" class="text-center py-10" style="display: none;">
+                    <i data-lucide="loader-2" class="w-12 h-12 animate-spin text-cyan-600 mx-auto"></i>
+                    <p class="mt-4 text-slate-600">A carregar dados do dashboard...</p>
+                </div>
+                 <div id="dashboard-error" class="hidden text-center py-10 bg-red-50 border border-red-200 rounded-lg">
+                    <i data-lucide="alert-triangle" class="w-12 h-12 text-red-500 mx-auto"></i>
+                    <p class="mt-4 font-semibold text-red-700">Não foi possível carregar os dados.</p>
+                    <p id="dashboard-error-details" class="text-sm text-red-600"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module">
+        // --- SDKs e CONFIGURAÇÕES ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, query, where, Timestamp, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        
+        // --- CREDENCIAIS ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDJR5gs6yHGnkeYVknnV8wWNodrHPZmAYs",
+            authDomain: "hokkaido-controle-producao.firebaseapp.com",
+            projectId: "hokkaido-controle-producao",
+            storageBucket: "hokkaido-controle-producao.appspot.com",
+            messagingSenderId: "436420480433",
+            appId: "1:436420480433:web:f2386beaa50a81cf3f4190"
+        };
+        
+        const SUPABASE_URL = 'https://hrukbkrzmabdrjyvpmff.supabase.co'; 
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhydWtia3J6bWFiZHJqeXZwbWZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MzI3OTEsImV4cCI6MjA3NTAwODc5MX0.Auiqvoq-w8EKLvc-KVysAk697uI2o-lEK8zh2cU7LKI';
+
+        // --- INICIALIZAÇÃO ---
+        let db;
+        try {
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+        } catch (error) {
+            console.error("Erro ao inicializar Firebase:", error);
+            alert("Erro fatal: Não foi possível conectar à base de dados. Verifique as credenciais do Firebase no código.");
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            
+            const machineSelect = document.getElementById('maquina');
+            const opInput = document.getElementById('op');
+            let plannedMachinesData = [];
+
+            // --- FUNÇÃO DE INTEGRAÇÃO (SUPABASE) ---
+            async function fetchPlannedMachines() {
+                machineSelect.innerHTML = `<option value="">A carregar máquinas do plano...</option>`;
+                machineSelect.disabled = true;
+
+                const today = new Date().toISOString().split('T')[0];
+                const url = `${SUPABASE_URL}/rest/v1/production_plan?select=machine,product&date=eq.${today}`;
+                
+                try {
+                    const response = await fetch(url, {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    });
+                    if (!response.ok) throw new Error(`Erro na rede ao buscar planeamento: ${response.statusText}`);
+                    const data = await response.json();
+                    
+                    plannedMachinesData = data;
+                    populateMachineSelect(plannedMachinesData);
+
+                } catch (error) {
+                    console.error('Erro ao buscar máquinas planeadas:', error);
+                    machineSelect.innerHTML = `<option value="">Erro ao carregar máquinas</option>`;
+                    alert(`Não foi possível carregar o planeamento: ${error.message}`);
+                } finally {
+                    machineSelect.disabled = false;
+                }
+            }
+
+            function populateMachineSelect(machines) {
+                if (!machines || machines.length === 0) {
+                    machineSelect.innerHTML = '<option value="">Nenhuma máquina no plano de hoje</option>';
+                    return;
+                }
+                machineSelect.innerHTML = '<option value="">Selecione uma Máquina do Plano</option>';
+                const uniqueMachines = [...new Set(machines.map(item => item.machine))].sort((a, b) => {
+                    return parseInt(a.split('-')[1]) - parseInt(b.split('-')[1]);
+                });
+                uniqueMachines.forEach(machine => {
+                    const option = document.createElement('option');
+                    option.value = machine;
+                    option.textContent = machine;
+                    machineSelect.appendChild(option);
+                });
+            }
+            
+            machineSelect.addEventListener('change', () => {
+                const selectedMachine = machineSelect.value;
+                const machinePlan = plannedMachinesData.find(plan => plan.machine === selectedMachine);
+                opInput.value = machinePlan ? machinePlan.product || 'Produto não encontrado' : '';
+            });
+
+            fetchPlannedMachines();
+
+            // --- LÓGICA DO FORMULÁRIO (FIREBASE) ---
+            const form = document.getElementById('production-form');
+            const submitButton = document.getElementById('submit-button');
+            const buttonText = submitButton.querySelector('span');
+            const statusMessage = document.getElementById('status-message');
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                submitButton.disabled = true;
+                buttonText.textContent = 'A enviar...';
+                statusMessage.textContent = '';
+                
+                const formData = new FormData(form);
+                const dataToSave = {
+                    operador: formData.get('operador'),
+                    maquina: formData.get('maquina'),
+                    turno: formData.get('turno'),
+                    produto: formData.get('produto'),
+                    produzido: Number(formData.get('produzido')),
+                    triagem: Number(formData.get('triagem')),
+                    refugo: Number(formData.get('refugo')),
+                    borras: Number(formData.get('borras')),
+                    perdas: formData.get('perdas'),
+                    timestamp: Timestamp.now()
+                };
+
+                try {
+                    await addDoc(collection(db, "perdas"), dataToSave);
+                    statusMessage.textContent = 'Lançamento salvo com sucesso!';
+                    statusMessage.className = 'text-sm font-semibold h-5 text-center text-green-600 fade-in-out';
+                    form.reset();
+                    opInput.value = '';
+                    fetchPlannedMachines();
+                } catch (error) {
+                    console.error('Erro ao salvar no Firebase:', error);
+                    statusMessage.textContent = `Erro ao salvar: ${error.message}`;
+                    statusMessage.className = 'text-sm font-semibold h-5 text-center text-red-600';
+                } finally {
+                    setTimeout(() => {
+                        submitButton.disabled = false;
+                        buttonText.textContent = 'Enviar Lançamento';
+                        if (!statusMessage.classList.contains('text-red-600')) {
+                             setTimeout(() => { statusMessage.textContent = ''; }, 4000);
+                        }
+                    }, 500);
+                }
+            });
+
+            // --- LÓGICA DO DASHBOARD (FIREBASE) ---
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabPanes = document.querySelectorAll('.tab-pane');
+            const startDateSelector = document.getElementById('start-date-selector');
+            const endDateSelector = document.getElementById('end-date-selector');
+            const refreshDashboardBtn = document.getElementById('refresh-dashboard-btn');
+            let refugoChartInstance = null;
+            let turnoChartInstance = null;
+            const dashboardContent = document.getElementById('dashboard-content');
+            const dashboardLoading = document.getElementById('dashboard-loading');
+            const dashboardError = document.getElementById('dashboard-error');
+            const dashboardErrorDetails = document.getElementById('dashboard-error-details');
+
+            const setTodayDate = () => {
+                const now = new Date();
+                const offset = now.getTimezoneOffset();
+                const localDate = new Date(now.getTime() - (offset * 60 * 1000));
+                const todayString = localDate.toISOString().split('T')[0];
+                startDateSelector.value = todayString;
+                endDateSelector.value = todayString;
+            };
+            setTodayDate();
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.dataset.tab;
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    tabPanes.forEach(pane => {
+                        pane.style.display = pane.id === `${tabId}-tab` ? 'block' : 'none';
+                    });
+                    if (tabId === 'dashboard') {
+                        loadDashboardData();
+                    }
+                });
+            });
+
+            refreshDashboardBtn.addEventListener('click', loadDashboardData);
+
+            async function loadDashboardData() {
+                const startDate = startDateSelector.value;
+                const endDate = endDateSelector.value;
+                if (!startDate || !endDate) {
+                    alert("Por favor, selecione a data de início e de fim.");
+                    return;
+                }
+                 if (new Date(startDate) > new Date(endDate)) {
+                    alert("A data de início não pode ser posterior à data de fim.");
+                    return;
+                }
+
+                dashboardContent.style.display = 'none';
+                dashboardError.style.display = 'none';
+                dashboardLoading.style.display = 'block';
+
+                try {
+                    const startTimestamp = Timestamp.fromDate(new Date(startDate + 'T00:00:00'));
+                    const endTimestamp = Timestamp.fromDate(new Date(endDate + 'T23:59:59'));
+
+                    const q = query(collection(db, "perdas"),
+                        where("timestamp", ">=", startTimestamp),
+                        where("timestamp", "<=", endTimestamp)
+                    );
+
+                    const querySnapshot = await getDocs(q);
+                    const data = [];
+                    querySnapshot.forEach((doc) => {
+                        data.push(doc.data());
+                    });
+                    
+                    processAndRenderDashboard(data);
+                    dashboardContent.style.display = 'block';
+
+                } catch (error) {
+                    console.error("Falha ao carregar dados do dashboard:", error);
+                    dashboardErrorDetails.textContent = error.message;
+                    dashboardError.style.display = 'block';
+                } finally {
+                    dashboardLoading.style.display = 'none';
+                }
+            }
+             
+            function processAndRenderDashboard(data) {
+                const kpiProducao = document.getElementById('kpi-producao');
+                const kpiRefugo = document.getElementById('kpi-refugo');
+                const kpiTriagem = document.getElementById('kpi-triagem');
+                const kpiBorras = document.getElementById('kpi-borras');
+
+                if (!data || data.length === 0) {
+                    kpiProducao.textContent = '0';
+                    kpiRefugo.textContent = '0.00 kg';
+                    kpiTriagem.textContent = '0';
+                    kpiBorras.textContent = '0.00 kg';
+                    
+                    if (refugoChartInstance) refugoChartInstance.destroy();
+                    if (turnoChartInstance) turnoChartInstance.destroy();
+                    
+                    const noDataMessage = (ctx) => {
+                        if (!ctx) return;
+                        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                        ctx.save();
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillStyle = '#64748b';
+                        ctx.font = "14px 'Inter', sans-serif";
+                        ctx.fillText('Sem dados para o período selecionado.', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                        ctx.restore();
+                    };
+
+                    noDataMessage(document.getElementById('refugoChart')?.getContext('2d'));
+                    noDataMessage(document.getElementById('turnoChart')?.getContext('2d'));
+                    return;
+                }
+
+                const totalProduzido = data.reduce((sum, row) => sum + Number(row.produzido || 0), 0);
+                const totalRefugo = data.reduce((sum, row) => sum + Number(row.refugo || 0), 0);
+                const totalTriagem = data.reduce((sum, row) => sum + Number(row.triagem || 0), 0);
+                const totalBorras = data.reduce((sum, row) => sum + Number(row.borras || 0), 0);
+                
+                kpiProducao.textContent = totalProduzido.toLocaleString('pt-BR');
+                kpiRefugo.textContent = `${totalRefugo.toFixed(2)} kg`;
+                kpiTriagem.textContent = totalTriagem.toLocaleString('pt-BR');
+                kpiBorras.textContent = `${totalBorras.toFixed(2)} kg`;
+
+                const refugoPorMotivo = data.reduce((acc, row) => {
+                    const motivo = row.perdas;
+                    const refugo = Number(row.refugo || 0);
+                    if (motivo && motivo !== 'N/A' && refugo > 0) {
+                        acc[motivo] = (acc[motivo] || 0) + refugo;
+                    }
+                    return acc;
+                }, {});
+                const sortedRefugo = Object.entries(refugoPorMotivo).sort(([, a], [, b]) => b - a);
+
+                const perdasPorTurno = data.reduce((acc, row) => {
+                    const turno = `${row.turno}º Turno`;
+                    acc[turno] = acc[turno] || { refugo: 0, borras: 0 };
+                    acc[turno].refugo += Number(row.refugo || 0);
+                    acc[turno].borras += Number(row.borras || 0);
+                    return acc;
+                }, { "1º Turno": {refugo: 0, borras: 0}, "2º Turno": {refugo: 0, borras: 0}, "3º Turno": {refugo: 0, borras: 0} });
+
+                renderRefugoChart(sortedRefugo);
+                renderTurnoChart(perdasPorTurno);
+            }
+            function renderRefugoChart(data) {
+                const ctx = document.getElementById('refugoChart').getContext('2d');
+                if (refugoChartInstance) refugoChartInstance.destroy();
+                refugoChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.map(item => item[0]),
+                        datasets: [{
+                            label: 'Refugo (kg)',
+                            data: data.map(item => item[1]),
+                            backgroundColor: 'rgba(239, 68, 68, 0.7)',
+                            borderColor: 'rgba(220, 38, 38, 1)',
+                            borderWidth: 1,
+                            borderRadius: 4,
+                        }]
+                    },
+                    options: { scales: { y: { beginAtZero: true } } }
+                });
+            }
+            function renderTurnoChart(data) {
+                const ctx = document.getElementById('turnoChart').getContext('2d');
+                 if (turnoChartInstance) turnoChartInstance.destroy();
+                turnoChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(data).sort(),
+                        datasets: [{
+                            label: 'Refugo (kg)',
+                            data: Object.keys(data).sort().map(turno => data[turno].refugo),
+                            backgroundColor: 'rgba(239, 68, 68, 0.7)',
+                            borderColor: 'rgba(239, 68, 68, 1)',
+                            borderWidth: 1,
+                            borderRadius: 4,
+                        }, {
+                            label: 'Borras (kg)',
+                            data: Object.keys(data).sort().map(turno => data[turno].borras),
+                             backgroundColor: 'rgba(34, 197, 94, 0.7)',
+                             borderColor: 'rgba(34, 197, 94, 1)',
+                             borderWidth: 1,
+                             borderRadius: 4,
+                        }]
+                    },
+                    options: { scales: { x: { stacked: false }, y: { stacked: false, beginAtZero: true } }, responsive: true, maintainAspectRatio: true }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+
