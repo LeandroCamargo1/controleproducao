@@ -28,16 +28,20 @@
         input::-webkit-outer-spin-button,
         input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
+        .pareto-toggle.active {
+            background-color: #0891b2; /* cyan-600 */
+            color: white;
+        }
     </style>
 </head>
-<body class="bg-slate-200 text-slate-800">
+<body class="bg-slate-200 text-slate-800 min-h-screen antialiased overflow-x-hidden">
 
-    <div class="container mx-auto p-4 md:p-6 lg:p-8">
+    <div class="container mx-auto p-3 sm:p-4 md:p-6 lg:p-8">
         
         <header class="text-center mb-8 w-full">
             <img src="https://hrukbkrzmabdrjyvpmff.supabase.co/storage/v1/object/public/logos/logo.svg" alt="Logo Hokkaido Plastics" class="mx-auto h-20 w-auto mb-4">
-            <h1 class="text-4xl md:text-5xl font-bold text-slate-900 bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-blue-500">Hokkaido Synchro</h1>
-            <p class="text-lg text-slate-600 font-medium mt-1">Controle de Produção e Perdas</p>
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-blue-500">Hokkaido Synchro</h1>
+            <p class="text-lg text-slate-600 font-medium mt-1">Controle de Perdas</p>
         </header>
 
         <div class="mb-6 border-b border-slate-300">
@@ -59,7 +63,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
                             <div>
                                 <label for="operador" class="block text-sm font-medium text-slate-700">Operador</label>
-                                <input type="number" id="operador" name="operador" required placeholder="" class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
+                                <input type="number" id="operador" name="operador" required placeholder="Ex: 12345" class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
                             </div>
                             <div>
                                 <label for="maquina" class="block text-sm font-medium text-slate-700">Máquina</label>
@@ -99,12 +103,28 @@
                                 <label for="perdas" class="block text-sm font-medium text-slate-700">Perdas (Motivo do Refugo)</label>
                                 <select id="perdas" name="perdas" required class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
                                     <option value="N/A">Não se aplica / Sem refugo</option>
-                                    <option value="Falha">Falha</option>
-                                    <option value="Rebarba">Rebarba</option>
-                                    <option value="Sujidade">Sujidade</option>
-                                    <option value="Contaminação">Contaminação</option>
-                                    <option value="Troca de cor">Troca de cor</option>
-                                    <option value="Reinicio de produção">Reinicio de produção</option>
+                                    <option value="BOLHA">BOLHA</option>
+                                    <option value="CHUPAGEM">CHUPAGEM</option>
+                                    <option value="CONTAMINAÇÃO">CONTAMINAÇÃO</option>
+                                    <option value="DEGRADAÇÃO">DEGRADAÇÃO</option>
+                                    <option value="DEFORMAÇÃO">DEFORMAÇÃO</option>
+                                    <option value="EMPENAMENTO">EMPENAMENTO</option>
+                                    <option value="FALHA">FALHA</option>
+                                    <option value="FIAPO">FIAPO</option>
+                                    <option value="FORA DE COR">FORA DE COR</option>
+                                    <option value="GALHO PRESO">GALHO PRESO</option>
+                                    <option value="INÍCIO/ REÍNICIO">INÍCIO/ REÍNICIO</option>
+                                    <option value="JUNÇÃO">JUNÇÃO</option>
+                                    <option value="MANCHAS">MANCHAS</option>
+                                    <option value="MARCA D'ÁGUA">MARCA D'ÁGUA</option>
+                                    <option value="MARCA EXTRATOR">MARCA EXTRATOR</option>
+                                    <option value="MEDIDA FORA DO ESPECIFICADO">MEDIDA FORA DO ESPECIFICADO</option>
+                                    <option value="MOÍDO">MOÍDO</option>
+                                    <option value="PEÇÃS PERDIDAS">PEÇÃS PERDIDAS</option>
+                                    <option value="QUEIMA">QUEIMA</option>
+                                    <option value="REBARBA">REBARBA</option>
+                                    <option value="RISCOS">RISCOS</option>
+                                    <option value="SUJIDADE">SUJIDADE</option>
                                 </select>
                             </div>
                         </div>
@@ -121,7 +141,7 @@
             </div>
 
             <div id="dashboard-tab" class="tab-pane" style="display: none;">
-                 <div class="mb-6 flex flex-col md:flex-row items-center justify-between gap-4 bg-white p-4 rounded-lg shadow-md">
+                 <div class="mb-6 flex flex-col xl:flex-row items-center justify-between gap-4 bg-white p-4 rounded-lg shadow-md">
                     <div class="w-full flex flex-col md:flex-row items-center gap-4">
                         <div class="flex-1 flex items-center gap-2">
                             <label for="start-date-selector" class="font-semibold text-slate-700 text-sm md:text-base whitespace-nowrap">De:</label>
@@ -131,8 +151,14 @@
                              <label for="end-date-selector" class="font-semibold text-slate-700 text-sm md:text-base whitespace-nowrap">Até:</label>
                             <input type="date" id="end-date-selector" class="w-full border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 transition">
                         </div>
+                         <div class="flex-1 flex items-center gap-2">
+                             <label for="machine-filter" class="font-semibold text-slate-700 text-sm md:text-base whitespace-nowrap">Máquina:</label>
+                            <select id="machine-filter" class="w-full border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 transition">
+                                <option value="total">Visão Geral (Total)</option>
+                            </select>
+                        </div>
                     </div>
-                    <button id="refresh-dashboard-btn" class="w-full md:w-auto bg-cyan-600 hover:bg-cyan-700 text-white font-bold p-2 px-6 rounded-lg transition-colors flex items-center justify-center gap-2" title="Atualizar dados do dashboard">
+                    <button id="refresh-dashboard-btn" class="w-full xl:w-auto bg-cyan-600 hover:bg-cyan-700 text-white font-bold p-2 px-6 rounded-lg transition-colors flex items-center justify-center gap-2" title="Atualizar dados do dashboard">
                         <i data-lucide="search" class="w-5 h-5"></i>
                         <span>Filtrar</span>
                     </button>
@@ -170,11 +196,17 @@
                         </div>
                     </div>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-red-500">
-                             <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-800 border-b-2 border-slate-100 pb-3"><i data-lucide="bar-chart-3" class="text-red-500"></i>Principais Motivos de Perdas (Pareto)</h2>
-                            <canvas id="refugoChart"></canvas>
+                        <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-red-500 relative">
+                            <div class="flex justify-between items-start">
+                                <h2 id="pareto-title" class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-800 border-b-2 border-slate-100 pb-3"><i data-lucide="bar-chart-3" class="text-red-500"></i>Principais Motivos de Perdas</h2>
+                                <div class="flex items-center rounded-md bg-slate-100 p-1 text-sm">
+                                    <button id="pareto-refugo-btn" class="pareto-toggle px-3 py-1 rounded-md transition-colors active">Refugo</button>
+                                    <button id="pareto-borras-btn" class="pareto-toggle px-3 py-1 rounded-md transition-colors">Borras</button>
+                                </div>
+                            </div>
+                            <canvas id="paretoChart"></canvas>
                         </div>
-                        <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-blue-500">
+                        <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-blue-500 relative">
                             <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-800 border-b-2 border-slate-100 pb-3"><i data-lucide="bar-chart-horizontal" class="text-blue-500"></i>Análise de Perdas por Turno (kg)</h2>
                              <canvas id="turnoChart"></canvas>
                         </div>
@@ -196,7 +228,7 @@
     <script type="module">
         // --- SDKs e CONFIGURAÇÕES ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, query, where, Timestamp, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, query, where, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
         
         // --- CREDENCIAIS ---
         const firebaseConfig = {
@@ -227,28 +259,21 @@
             const machineSelect = document.getElementById('maquina');
             const opInput = document.getElementById('op');
             let plannedMachinesData = [];
+            let fullDashboardData = []; // Armazena todos os dados do período
+            let currentParetoMode = 'refugo'; // 'refugo' ou 'borras'
 
             // --- FUNÇÃO DE INTEGRAÇÃO (SUPABASE) ---
             async function fetchPlannedMachines() {
                 machineSelect.innerHTML = `<option value="">A carregar máquinas do plano...</option>`;
                 machineSelect.disabled = true;
-
                 const today = new Date().toISOString().split('T')[0];
                 const url = `${SUPABASE_URL}/rest/v1/production_plan?select=machine,product&date=eq.${today}`;
-                
                 try {
-                    const response = await fetch(url, {
-                        headers: {
-                            'apikey': SUPABASE_KEY,
-                            'Authorization': `Bearer ${SUPABASE_KEY}`
-                        }
-                    });
+                    const response = await fetch(url, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
                     if (!response.ok) throw new Error(`Erro na rede ao buscar planeamento: ${response.statusText}`);
                     const data = await response.json();
-                    
                     plannedMachinesData = data;
                     populateMachineSelect(plannedMachinesData);
-
                 } catch (error) {
                     console.error('Erro ao buscar máquinas planeadas:', error);
                     machineSelect.innerHTML = `<option value="">Erro ao carregar máquinas</option>`;
@@ -264,9 +289,7 @@
                     return;
                 }
                 machineSelect.innerHTML = '<option value="">Selecione uma Máquina do Plano</option>';
-                const uniqueMachines = [...new Set(machines.map(item => item.machine))].sort((a, b) => {
-                    return parseInt(a.split('-')[1]) - parseInt(b.split('-')[1]);
-                });
+                const uniqueMachines = [...new Set(machines.map(item => item.machine))].sort((a, b) => parseInt(a.split('-')[1]) - parseInt(b.split('-')[1]));
                 uniqueMachines.forEach(machine => {
                     const option = document.createElement('option');
                     option.value = machine;
@@ -294,7 +317,6 @@
                 submitButton.disabled = true;
                 buttonText.textContent = 'A enviar...';
                 statusMessage.textContent = '';
-                
                 const formData = new FormData(form);
                 const dataToSave = {
                     operador: formData.get('operador'),
@@ -308,7 +330,6 @@
                     perdas: formData.get('perdas'),
                     timestamp: Timestamp.now()
                 };
-
                 try {
                     await addDoc(collection(db, "perdas"), dataToSave);
                     statusMessage.textContent = 'Lançamento salvo com sucesso!';
@@ -336,8 +357,11 @@
             const tabPanes = document.querySelectorAll('.tab-pane');
             const startDateSelector = document.getElementById('start-date-selector');
             const endDateSelector = document.getElementById('end-date-selector');
+            const machineFilter = document.getElementById('machine-filter');
             const refreshDashboardBtn = document.getElementById('refresh-dashboard-btn');
-            let refugoChartInstance = null;
+            const paretoRefugoBtn = document.getElementById('pareto-refugo-btn');
+            const paretoBorrasBtn = document.getElementById('pareto-borras-btn');
+            let paretoChartInstance = null;
             let turnoChartInstance = null;
             const dashboardContent = document.getElementById('dashboard-content');
             const dashboardLoading = document.getElementById('dashboard-loading');
@@ -369,41 +393,41 @@
             });
 
             refreshDashboardBtn.addEventListener('click', loadDashboardData);
+            machineFilter.addEventListener('change', () => processAndRenderDashboard(fullDashboardData));
+            
+            paretoRefugoBtn.addEventListener('click', () => {
+                currentParetoMode = 'refugo';
+                paretoRefugoBtn.classList.add('active');
+                paretoBorrasBtn.classList.remove('active');
+                processAndRenderDashboard(fullDashboardData);
+            });
+             paretoBorrasBtn.addEventListener('click', () => {
+                currentParetoMode = 'borras';
+                paretoBorrasBtn.classList.add('active');
+                paretoRefugoBtn.classList.remove('active');
+                processAndRenderDashboard(fullDashboardData);
+            });
 
             async function loadDashboardData() {
                 const startDate = startDateSelector.value;
                 const endDate = endDateSelector.value;
-                if (!startDate || !endDate) {
-                    alert("Por favor, selecione a data de início e de fim.");
+                if (!startDate || !endDate || new Date(startDate) > new Date(endDate)) {
+                    alert("Por favor, selecione um período de datas válido.");
                     return;
                 }
-                 if (new Date(startDate) > new Date(endDate)) {
-                    alert("A data de início não pode ser posterior à data de fim.");
-                    return;
-                }
-
                 dashboardContent.style.display = 'none';
                 dashboardError.style.display = 'none';
                 dashboardLoading.style.display = 'block';
-
                 try {
                     const startTimestamp = Timestamp.fromDate(new Date(startDate + 'T00:00:00'));
                     const endTimestamp = Timestamp.fromDate(new Date(endDate + 'T23:59:59'));
-
-                    const q = query(collection(db, "perdas"),
-                        where("timestamp", ">=", startTimestamp),
-                        where("timestamp", "<=", endTimestamp)
-                    );
-
+                    const q = query(collection(db, "perdas"), where("timestamp", ">=", startTimestamp), where("timestamp", "<=", endTimestamp));
                     const querySnapshot = await getDocs(q);
-                    const data = [];
-                    querySnapshot.forEach((doc) => {
-                        data.push(doc.data());
-                    });
-                    
-                    processAndRenderDashboard(data);
+                    fullDashboardData = [];
+                    querySnapshot.forEach((doc) => { fullDashboardData.push(doc.data()); });
+                    populateMachineFilter(fullDashboardData);
+                    processAndRenderDashboard(fullDashboardData);
                     dashboardContent.style.display = 'block';
-
                 } catch (error) {
                     console.error("Falha ao carregar dados do dashboard:", error);
                     dashboardErrorDetails.textContent = error.message;
@@ -412,22 +436,36 @@
                     dashboardLoading.style.display = 'none';
                 }
             }
+
+            function populateMachineFilter(data) {
+                const currentVal = machineFilter.value;
+                const machines = [...new Set(data.map(item => item.maquina))].sort();
+                machineFilter.innerHTML = '<option value="total">Visão Geral (Total)</option>';
+                machines.forEach(machine => {
+                    const option = document.createElement('option');
+                    option.value = machine;
+                    option.textContent = machine;
+                    machineFilter.appendChild(option);
+                });
+                if (machines.includes(currentVal)) { machineFilter.value = currentVal; }
+            }
              
             function processAndRenderDashboard(data) {
+                const selectedMachine = machineFilter.value;
+                const filteredData = selectedMachine === 'total' ? data : data.filter(row => row.maquina === selectedMachine);
+
                 const kpiProducao = document.getElementById('kpi-producao');
                 const kpiRefugo = document.getElementById('kpi-refugo');
                 const kpiTriagem = document.getElementById('kpi-triagem');
                 const kpiBorras = document.getElementById('kpi-borras');
 
-                if (!data || data.length === 0) {
+                if (filteredData.length === 0) {
                     kpiProducao.textContent = '0';
                     kpiRefugo.textContent = '0.00 kg';
                     kpiTriagem.textContent = '0';
                     kpiBorras.textContent = '0.00 kg';
-                    
-                    if (refugoChartInstance) refugoChartInstance.destroy();
+                    if (paretoChartInstance) paretoChartInstance.destroy();
                     if (turnoChartInstance) turnoChartInstance.destroy();
-                    
                     const noDataMessage = (ctx) => {
                         if (!ctx) return;
                         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -436,89 +474,75 @@
                         ctx.textBaseline = 'middle';
                         ctx.fillStyle = '#64748b';
                         ctx.font = "14px 'Inter', sans-serif";
-                        ctx.fillText('Sem dados para o período selecionado.', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                        ctx.fillText('Sem dados para a seleção atual.', ctx.canvas.width / 2, ctx.canvas.height / 2);
                         ctx.restore();
                     };
-
-                    noDataMessage(document.getElementById('refugoChart')?.getContext('2d'));
+                    noDataMessage(document.getElementById('paretoChart')?.getContext('2d'));
                     noDataMessage(document.getElementById('turnoChart')?.getContext('2d'));
                     return;
                 }
 
-                const totalProduzido = data.reduce((sum, row) => sum + Number(row.produzido || 0), 0);
-                const totalRefugo = data.reduce((sum, row) => sum + Number(row.refugo || 0), 0);
-                const totalTriagem = data.reduce((sum, row) => sum + Number(row.triagem || 0), 0);
-                const totalBorras = data.reduce((sum, row) => sum + Number(row.borras || 0), 0);
+                const totalProduzido = filteredData.reduce((sum, row) => sum + Number(row.produzido || 0), 0);
+                const totalRefugo = filteredData.reduce((sum, row) => sum + Number(row.refugo || 0), 0);
+                const totalTriagem = filteredData.reduce((sum, row) => sum + Number(row.triagem || 0), 0);
+                const totalBorras = filteredData.reduce((sum, row) => sum + Number(row.borras || 0), 0);
                 
                 kpiProducao.textContent = totalProduzido.toLocaleString('pt-BR');
                 kpiRefugo.textContent = `${totalRefugo.toFixed(2)} kg`;
                 kpiTriagem.textContent = totalTriagem.toLocaleString('pt-BR');
                 kpiBorras.textContent = `${totalBorras.toFixed(2)} kg`;
 
-                const refugoPorMotivo = data.reduce((acc, row) => {
-                    const motivo = row.perdas;
-                    const refugo = Number(row.refugo || 0);
-                    if (motivo && motivo !== 'N/A' && refugo > 0) {
-                        acc[motivo] = (acc[motivo] || 0) + refugo;
-                    }
-                    return acc;
-                }, {});
-                const sortedRefugo = Object.entries(refugoPorMotivo).sort(([, a], [, b]) => b - a);
-
-                const perdasPorTurno = data.reduce((acc, row) => {
+                if (currentParetoMode === 'refugo') {
+                    document.getElementById('pareto-title').innerHTML = `<i data-lucide="bar-chart-3" class="text-red-500"></i>Principais Motivos de Perdas`;
+                    const refugoPorMotivo = filteredData.reduce((acc, row) => {
+                        const motivo = row.perdas;
+                        const refugo = Number(row.refugo || 0);
+                        if (motivo && motivo !== 'N/A' && refugo > 0) {
+                            acc[motivo] = (acc[motivo] || 0) + refugo;
+                        }
+                        return acc;
+                    }, {});
+                    const sortedRefugo = Object.entries(refugoPorMotivo).sort(([, a], [, b]) => b - a);
+                    renderParetoChart(sortedRefugo, 'Refugo (kg)', 'rgba(239, 68, 68, 0.7)');
+                } else { // modo 'borras'
+                    document.getElementById('pareto-title').innerHTML = `<i data-lucide="bar-chart-3" class="text-green-500"></i>Maiores Geradores de Borras`;
+                    const borrasPorMaquina = (selectedMachine === 'total' ? data : [data.find(row => row.maquina === selectedMachine)].filter(Boolean))
+                        .reduce((acc, row) => {
+                            const maquina = row.maquina;
+                            const borras = Number(row.borras || 0);
+                            if (maquina && borras > 0) {
+                                acc[maquina] = (acc[maquina] || 0) + borras;
+                            }
+                            return acc;
+                        }, {});
+                    const sortedBorras = Object.entries(borrasPorMaquina).sort(([, a], [, b]) => b - a);
+                    renderParetoChart(sortedBorras, 'Borras (kg)', 'rgba(34, 197, 94, 0.7)');
+                }
+                
+                const perdasPorTurno = filteredData.reduce((acc, row) => {
                     const turno = `${row.turno}º Turno`;
                     acc[turno] = acc[turno] || { refugo: 0, borras: 0 };
                     acc[turno].refugo += Number(row.refugo || 0);
                     acc[turno].borras += Number(row.borras || 0);
                     return acc;
                 }, { "1º Turno": {refugo: 0, borras: 0}, "2º Turno": {refugo: 0, borras: 0}, "3º Turno": {refugo: 0, borras: 0} });
-
-                renderRefugoChart(sortedRefugo);
+                
                 renderTurnoChart(perdasPorTurno);
+                lucide.createIcons();
             }
-            function renderRefugoChart(data) {
-                const ctx = document.getElementById('refugoChart').getContext('2d');
-                if (refugoChartInstance) refugoChartInstance.destroy();
-                refugoChartInstance = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: data.map(item => item[0]),
-                        datasets: [{
-                            label: 'Refugo (kg)',
-                            data: data.map(item => item[1]),
-                            backgroundColor: 'rgba(239, 68, 68, 0.7)',
-                            borderColor: 'rgba(220, 38, 38, 1)',
-                            borderWidth: 1,
-                            borderRadius: 4,
-                        }]
-                    },
-                    options: { scales: { y: { beginAtZero: true } } }
+
+            function renderParetoChart(data, label, color) {
+                const ctx = document.getElementById('paretoChart').getContext('2d');
+                if (paretoChartInstance) paretoChartInstance.destroy();
+                paretoChartInstance = new Chart(ctx, {
+                    type: 'bar', data: { labels: data.map(item => item[0]), datasets: [{ label: label, data: data.map(item => item[1]), backgroundColor: color, borderColor: color.replace('0.7', '1'), borderWidth: 1, borderRadius: 4, }] }, options: { scales: { y: { beginAtZero: true } } }
                 });
             }
             function renderTurnoChart(data) {
                 const ctx = document.getElementById('turnoChart').getContext('2d');
-                 if (turnoChartInstance) turnoChartInstance.destroy();
+                if (turnoChartInstance) turnoChartInstance.destroy();
                 turnoChartInstance = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: Object.keys(data).sort(),
-                        datasets: [{
-                            label: 'Refugo (kg)',
-                            data: Object.keys(data).sort().map(turno => data[turno].refugo),
-                            backgroundColor: 'rgba(239, 68, 68, 0.7)',
-                            borderColor: 'rgba(239, 68, 68, 1)',
-                            borderWidth: 1,
-                            borderRadius: 4,
-                        }, {
-                            label: 'Borras (kg)',
-                            data: Object.keys(data).sort().map(turno => data[turno].borras),
-                             backgroundColor: 'rgba(34, 197, 94, 0.7)',
-                             borderColor: 'rgba(34, 197, 94, 1)',
-                             borderWidth: 1,
-                             borderRadius: 4,
-                        }]
-                    },
-                    options: { scales: { x: { stacked: false }, y: { stacked: false, beginAtZero: true } }, responsive: true, maintainAspectRatio: true }
+                    type: 'bar', data: { labels: Object.keys(data).sort(), datasets: [{ label: 'Refugo (kg)', data: Object.keys(data).sort().map(turno => data[turno].refugo), backgroundColor: 'rgba(239, 68, 68, 0.7)', borderColor: 'rgba(239, 68, 68, 1)', borderWidth: 1, borderRadius: 4, }, { label: 'Borras (kg)', data: Object.keys(data).sort().map(turno => data[turno].borras), backgroundColor: 'rgba(34, 197, 94, 0.7)', borderColor: 'rgba(34, 197, 94, 1)', borderWidth: 1, borderRadius: 4, }] }, options: { scales: { x: { stacked: false }, y: { stacked: false, beginAtZero: true } }, responsive: true, maintainAspectRatio: true }
                 });
             }
         });
