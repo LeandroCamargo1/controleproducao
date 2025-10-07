@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hokkaido Synchro - Controle de Perdas v2.7</title>
+    <title>Hokkaido Synchro - Controle de Perdas v2.11</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -31,6 +31,14 @@
         .pareto-toggle.active {
             background-color: #0891b2; /* cyan-600 */
             color: white;
+        }
+        .kpi-card-interactive {
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .kpi-card-interactive:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
         }
     </style>
 </head>
@@ -154,12 +162,15 @@
                                 <p id="kpi-producao" class="text-2xl font-bold">...</p>
                             </div>
                         </div>
-                         <div class="bg-white p-5 rounded-lg shadow-lg flex items-center gap-4">
-                            <div class="p-3 bg-red-100 rounded-full"><i data-lucide="trash-2" class="w-7 h-7 text-red-600"></i></div>
-                            <div>
-                                <p class="text-sm text-slate-500">Refugo Total (kg)</p>
-                                <p id="kpi-refugo" class="text-2xl font-bold">...</p>
+                         <div id="refugo-card" class="kpi-card-interactive bg-white p-5 rounded-lg shadow-lg flex items-center justify-between gap-4">
+                            <div class="flex items-center gap-4">
+                                <div class="p-3 bg-red-100 rounded-full"><i data-lucide="trash-2" class="w-7 h-7 text-red-600"></i></div>
+                                <div>
+                                    <p id="kpi-refugo-label" class="text-sm text-slate-500">Refugo Total (kg)</p>
+                                    <p id="kpi-refugo" class="text-2xl font-bold">...</p>
+                                </div>
                             </div>
+                            <i data-lucide="repeat" class="w-5 h-5 text-slate-400"></i>
                         </div>
                         <div class="bg-white p-5 rounded-lg shadow-lg flex items-center gap-4">
                             <div class="p-3 bg-purple-100 rounded-full"><i data-lucide="clipboard-check" class="w-7 h-7 text-purple-600"></i></div>
@@ -298,14 +309,17 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
-            
+            // --- VARIÁVEIS GLOBAIS DO SCRIPT ---
             let plannedMachinesData = [];
-            let fullDashboardData = []; 
+            let fullDashboardData = [];
             let currentParetoMode = 'refugo';
             let paretoChartInstance = null;
             let turnoChartInstance = null;
+            let pieceWeightMap = new Map();
+            let kpiValues = {};
+            let refugoViewMode = 'kg';
 
+            // --- SELETORES DE DOM ---
             const machineSelect = document.getElementById('maquina');
             const opInput = document.getElementById('op');
             const form = document.getElementById('production-form');
@@ -320,49 +334,43 @@
             const verificacaoDateSelector = document.getElementById('verificacao-date-selector');
             const refreshVerificacaoBtn = document.getElementById('refresh-verificacao-btn');
             const verificacaoTableBody = document.getElementById('verificacao-table-body');
-            
-            async function fetchPlannedMachines() {
-                machineSelect.innerHTML = `<option value="">A carregar máquinas...</option>`;
-                machineSelect.disabled = true;
-                const productionDay = getProductionDateString();
-                const url = `${SUPABASE_URL}/rest/v1/production_plan?select=machine,product&date=eq.${productionDay}`;
-                try {
-                    const response = await fetch(url, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
-                    if (!response.ok) throw new Error(`Erro na rede: ${response.statusText}`);
-                    const data = await response.json();
-                    plannedMachinesData = data;
-                    populateMachineSelect(plannedMachinesData);
-                } catch (error) {
-                    console.error('Erro ao buscar máquinas planeadas:', error);
-                    machineSelect.innerHTML = `<option value="">Erro ao carregar</option>`;
-                    alert(`Não foi possível carregar o planeamento: ${error.message}`);
-                } finally {
-                    machineSelect.disabled = false;
-                }
-            }
+            const refugoCard = document.getElementById('refugo-card');
 
-            function populateMachineSelect(machines) {
-                if (!machines || machines.length === 0) {
-                    machineSelect.innerHTML = '<option value="">Nenhuma máquina no plano de hoje</option>';
-                    return;
+            // --- FUNÇÕES DE LÓGICA PRINCIPAL ---
+            const init = () => {
+                lucide.createIcons();
+                setTodayDate();
+                fetchPlannedMachines();
+                setupEventListeners();
+            };
+
+            const setupEventListeners = () => {
+                if (machineSelect) machineSelect.addEventListener('change', onMachineSelectChange);
+                if (form) form.addEventListener('submit', handleFormSubmit);
+                if (tabButtons) tabButtons.forEach(button => button.addEventListener('click', handleTabClick));
+                if (refreshDashboardBtn) refreshDashboardBtn.addEventListener('click', loadDashboardData);
+                if (machineFilter) machineFilter.addEventListener('change', () => processAndRenderDashboard(fullDashboardData));
+                if (paretoRefugoBtn) paretoRefugoBtn.addEventListener('click', () => setParetoMode('refugo'));
+                if (paretoBorrasBtn) paretoBorrasBtn.addEventListener('click', () => setParetoMode('borras'));
+                if (refugoCard) refugoCard.addEventListener('click', toggleRefugoView);
+                if (refreshVerificacaoBtn) refreshVerificacaoBtn.addEventListener('click', loadVerificacaoData);
+                if (verificacaoTableBody) verificacaoTableBody.addEventListener('click', handleVerificacaoTableClick);
+                
+                const confirmModal = document.getElementById('confirm-modal');
+                if(confirmModal) {
+                    document.getElementById('confirm-modal-cancel-btn').addEventListener('click', hideConfirmModal);
+                    document.getElementById('confirm-modal-ok-btn').addEventListener('click', executeDelete);
                 }
-                machineSelect.innerHTML = '<option value="">Selecione uma Máquina</option>';
-                const uniqueMachines = [...new Set(machines.map(item => item.machine))].sort((a, b) => parseInt(a.split('-')[1]) - parseInt(b.split('-')[1]));
-                uniqueMachines.forEach(machine => {
-                    const option = document.createElement('option');
-                    option.value = machine;
-                    option.textContent = machine;
-                    machineSelect.appendChild(option);
-                });
-            }
-            
-            machineSelect.addEventListener('change', () => {
+            };
+
+            // --- FUNÇÕES DE EVENTOS ---
+            const onMachineSelectChange = () => {
                 const selectedMachine = machineSelect.value;
                 const machinePlan = plannedMachinesData.find(plan => plan.machine === selectedMachine);
                 opInput.value = machinePlan ? machinePlan.product || '' : '';
-            });
+            };
 
-            form.addEventListener('submit', async (e) => {
+            const handleFormSubmit = async (e) => {
                 e.preventDefault();
                 const submitButton = document.getElementById('submit-button');
                 const buttonText = submitButton.querySelector('span');
@@ -397,55 +405,68 @@
                         }
                     }, 500);
                 }
-            });
-
-            tabButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const tabId = button.dataset.tab;
-                    tabButtons.forEach(btn => btn.classList.remove('active'));
-                    button.classList.add('active');
-                    tabPanes.forEach(pane => {
-                        pane.style.display = pane.id === `${tabId}-tab` ? 'block' : 'none';
-                    });
-                    if (tabId === 'dashboard') loadDashboardData();
-                    if (tabId === 'verificacao') loadVerificacaoData();
-                });
-            });
-
-            const setTodayDate = () => {
-                const todayString = getProductionDateString();
-                startDateSelector.value = todayString;
-                endDateSelector.value = todayString;
-                verificacaoDateSelector.value = todayString;
             };
-            setTodayDate();
 
-            refreshDashboardBtn.addEventListener('click', loadDashboardData);
-            machineFilter.addEventListener('change', () => processAndRenderDashboard(fullDashboardData));
-            paretoRefugoBtn.addEventListener('click', () => {
-                currentParetoMode = 'refugo';
-                paretoRefugoBtn.classList.add('active');
-                paretoBorrasBtn.classList.remove('active');
+            const handleTabClick = (e) => {
+                const tabId = e.currentTarget.dataset.tab;
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                tabPanes.forEach(pane => {
+                    pane.style.display = pane.id === `${tabId}-tab` ? 'block' : 'none';
+                });
+                if (tabId === 'dashboard') loadDashboardData();
+                if (tabId === 'verificacao') loadVerificacaoData();
+            };
+
+            const setParetoMode = (mode) => {
+                currentParetoMode = mode;
+                paretoRefugoBtn.classList.toggle('active', mode === 'refugo');
+                paretoBorrasBtn.classList.toggle('active', mode === 'borras');
                 processAndRenderDashboard(fullDashboardData);
-            });
-            paretoBorrasBtn.addEventListener('click', () => {
-                currentParetoMode = 'borras';
-                paretoBorrasBtn.classList.add('active');
-                paretoRefugoBtn.classList.remove('active');
-                processAndRenderDashboard(fullDashboardData);
-            });
+            };
+
+            const toggleRefugoView = () => {
+                refugoViewMode = refugoViewMode === 'kg' ? 'pcs' : 'kg';
+                updateRefugoCard();
+            };
+
+            const handleVerificacaoTableClick = (e) => {
+                const deleteBtn = e.target.closest('.delete-btn');
+                if (deleteBtn) {
+                    showConfirmModal(deleteBtn.dataset.id);
+                }
+            };
+
+            // --- FUNÇÕES DE DADOS E API ---
+            async function fetchPlannedMachines() {
+                machineSelect.innerHTML = `<option value="">A carregar máquinas...</option>`;
+                machineSelect.disabled = true;
+                const productionDay = getProductionDateString();
+                const url = `${SUPABASE_URL}/rest/v1/production_plan?select=machine,product,piece_weight&date=eq.${productionDay}`;
+                try {
+                    const response = await fetch(url, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
+                    if (!response.ok) throw new Error(`Erro na rede: ${response.statusText}`);
+                    const data = await response.json();
+                    plannedMachinesData = data;
+                    populateMachineSelect(plannedMachinesData);
+                } catch (error) {
+                    console.error('Erro ao buscar máquinas planeadas:', error);
+                    machineSelect.innerHTML = `<option value="">Erro ao carregar</option>`;
+                    alert(`Não foi possível carregar o planeamento: ${error.message}`);
+                } finally {
+                    machineSelect.disabled = false;
+                }
+            }
 
             async function loadDashboardData() {
                 const dashboardContent = document.getElementById('dashboard-content');
                 const dashboardLoading = document.getElementById('dashboard-loading');
                 const dashboardError = document.getElementById('dashboard-error');
                 const dashboardErrorDetails = document.getElementById('dashboard-error-details');
-                
                 const startDateStr = startDateSelector.value;
                 const endDateStr = endDateSelector.value;
                 if (!startDateStr || !endDateStr || new Date(startDateStr) > new Date(endDateStr)) {
-                    alert("Por favor, selecione um período de datas válido.");
-                    return;
+                    alert("Por favor, selecione um período de datas válido."); return;
                 }
                 dashboardContent.style.display = 'none';
                 dashboardError.style.display = 'none';
@@ -456,6 +477,14 @@
                     endDate.setDate(endDate.getDate() + 1);
                     const q = query(collection(db, "perdas"), where("timestamp", ">=", Timestamp.fromDate(startDate)), where("timestamp", "<", Timestamp.fromDate(endDate)));
                     const querySnapshot = await getDocs(q);
+                    
+                    const url = `${SUPABASE_URL}/rest/v1/production_plan?select=product,piece_weight&date=gte.${startDateStr}&date=lte.${endDateStr}`;
+                    const response = await fetch(url, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
+                    if (!response.ok) throw new Error(`Erro na rede ao buscar pesos: ${response.statusText}`);
+                    const weightsData = await response.json();
+                    pieceWeightMap.clear();
+                    weightsData.forEach(item => { if (item.product && item.piece_weight) { pieceWeightMap.set(item.product, item.piece_weight); }});
+                    
                     fullDashboardData = [];
                     querySnapshot.forEach((doc) => { fullDashboardData.push(doc.data()); });
                     populateMachineFilter(fullDashboardData);
@@ -470,6 +499,48 @@
                 }
             }
             
+            async function loadVerificacaoData() {
+                const dateStr = verificacaoDateSelector.value;
+                if (!dateStr) return;
+                const loading = document.getElementById('verificacao-loading');
+                const noData = document.getElementById('verificacao-no-data');
+                loading.style.display = 'block';
+                noData.style.display = 'none';
+                verificacaoTableBody.innerHTML = '';
+                try {
+                    const startDate = new Date(dateStr + 'T07:00:00');
+                    const endDate = new Date(dateStr + 'T07:00:00');
+                    endDate.setDate(endDate.getDate() + 1);
+                    const q = query(collection(db, "perdas"), where("timestamp", ">=", Timestamp.fromDate(startDate)), where("timestamp", "<", Timestamp.fromDate(endDate)), orderBy("timestamp", "desc"));
+                    const querySnapshot = await getDocs(q);
+                    if (querySnapshot.empty) {
+                        noData.style.display = 'block';
+                    } else {
+                        querySnapshot.forEach(doc => renderVerificacaoRow({ id: doc.id, ...doc.data() }));
+                    }
+                } catch (error) {
+                    console.error("Erro ao buscar dados para verificação:", error);
+                    alert("Não foi possível carregar os lançamentos.");
+                } finally {
+                    loading.style.display = 'none';
+                }
+            }
+
+            // --- FUNÇÕES DE RENDERIZAÇÃO E UI ---
+            function populateMachineSelect(machines) {
+                if (!machines || machines.length === 0) {
+                    machineSelect.innerHTML = '<option value="">Nenhuma máquina no plano de hoje</option>'; return;
+                }
+                machineSelect.innerHTML = '<option value="">Selecione uma Máquina</option>';
+                const uniqueMachines = [...new Set(machines.map(item => item.machine))].sort((a, b) => parseInt(a.split('-')[1]) - parseInt(b.split('-')[1]));
+                uniqueMachines.forEach(machine => {
+                    const option = document.createElement('option');
+                    option.value = machine;
+                    option.textContent = machine;
+                    machineSelect.appendChild(option);
+                });
+            }
+
             function populateMachineFilter(data) {
                 const currentVal = machineFilter.value;
                 const machines = [...new Set(data.map(item => item.maquina))].sort();
@@ -486,10 +557,6 @@
             function processAndRenderDashboard(data) {
                 const selectedMachine = machineFilter.value;
                 const filteredData = selectedMachine === 'total' ? data : data.filter(row => row.maquina === selectedMachine);
-                const kpiProducao = document.getElementById('kpi-producao');
-                const kpiRefugo = document.getElementById('kpi-refugo');
-                const kpiTriagem = document.getElementById('kpi-triagem');
-                const kpiBorras = document.getElementById('kpi-borras');
                 
                 const noDataMessage = (ctx) => {
                     if (!ctx) return;
@@ -504,10 +571,8 @@
                 };
 
                 if (!filteredData || filteredData.length === 0) {
-                    kpiProducao.textContent = '0';
-                    kpiRefugo.textContent = '0.00 kg';
-                    kpiTriagem.textContent = '0';
-                    kpiBorras.textContent = '0.00 kg';
+                    kpiValues = { producao: 0, refugoKg: 0, refugoPcs: 0, triagem: 0, borras: 0 };
+                    updateKpiCards();
                     if (paretoChartInstance) paretoChartInstance.destroy();
                     if (turnoChartInstance) turnoChartInstance.destroy();
                     noDataMessage(document.getElementById('paretoChart')?.getContext('2d'));
@@ -515,13 +580,19 @@
                     return;
                 }
                 const totalProduzido = filteredData.reduce((sum, row) => sum + Number(row.produzido || 0), 0);
-                const totalRefugo = filteredData.reduce((sum, row) => sum + Number(row.refugo || 0), 0);
+                const totalRefugoKg = filteredData.reduce((sum, row) => sum + Number(row.refugo || 0), 0);
                 const totalTriagem = filteredData.reduce((sum, row) => sum + Number(row.triagem || 0), 0);
                 const totalBorras = filteredData.reduce((sum, row) => sum + Number(row.borras || 0), 0);
-                kpiProducao.textContent = totalProduzido.toLocaleString('pt-BR');
-                kpiRefugo.textContent = `${totalRefugo.toFixed(2)} kg`;
-                kpiTriagem.textContent = totalTriagem.toLocaleString('pt-BR');
-                kpiBorras.textContent = `${totalBorras.toFixed(2)} kg`;
+                const totalRefugoPcs = filteredData.reduce((sum, row) => {
+                    const weight = pieceWeightMap.get(row.produto);
+                    if (weight && weight > 0 && row.refugo > 0) {
+                        return sum + ((row.refugo * 1000) / weight);
+                    }
+                    return sum;
+                }, 0);
+                
+                kpiValues = { producao: totalProduzido, refugoKg: totalRefugoKg, refugoPcs: totalRefugoPcs, triagem: totalTriagem, borras: totalBorras };
+                updateKpiCards();
 
                 if (currentParetoMode === 'refugo') {
                     document.getElementById('pareto-title').innerHTML = `<i data-lucide="bar-chart-3" class="text-red-500"></i>Principais Motivos de Perdas`;
@@ -559,6 +630,25 @@
                 lucide.createIcons();
             }
 
+            function updateKpiCards() {
+                document.getElementById('kpi-producao').textContent = (kpiValues.producao || 0).toLocaleString('pt-BR');
+                document.getElementById('kpi-triagem').textContent = (kpiValues.triagem || 0).toLocaleString('pt-BR');
+                document.getElementById('kpi-borras').textContent = `${(kpiValues.borras || 0).toFixed(2)} kg`;
+                updateRefugoCard();
+            }
+
+            function updateRefugoCard() {
+                const label = document.getElementById('kpi-refugo-label');
+                const value = document.getElementById('kpi-refugo');
+                if (refugoViewMode === 'kg') {
+                    label.textContent = 'Refugo Total (kg)';
+                    value.textContent = `${(kpiValues.refugoKg || 0).toFixed(2)} kg`;
+                } else {
+                    label.textContent = 'Refugo Total (pçs)';
+                    value.textContent = `${Math.round(kpiValues.refugoPcs || 0).toLocaleString('pt-BR')} pçs`;
+                }
+            }
+
             function renderParetoChart(data, label, color) {
                 const ctx = document.getElementById('paretoChart').getContext('2d');
                 if (paretoChartInstance) paretoChartInstance.destroy();
@@ -570,37 +660,6 @@
                 turnoChartInstance = new Chart(ctx, { type: 'bar', data: { labels: Object.keys(data).sort(), datasets: [{ label: 'Refugo (kg)', data: Object.keys(data).sort().map(turno => data[turno].refugo), backgroundColor: 'rgba(239, 68, 68, 0.7)', borderColor: 'rgba(239, 68, 68, 1)', borderWidth: 1, borderRadius: 4, }, { label: 'Borras (kg)', data: Object.keys(data).sort().map(turno => data[turno].borras), backgroundColor: 'rgba(34, 197, 94, 0.7)', borderColor: 'rgba(34, 197, 94, 1)', borderWidth: 1, borderRadius: 4, }] }, options: { scales: { x: { stacked: false }, y: { stacked: false, beginAtZero: true } }, responsive: true, maintainAspectRatio: true } });
             }
             
-            refreshVerificacaoBtn.addEventListener('click', loadVerificacaoData);
-            
-            async function loadVerificacaoData() {
-                const dateStr = verificacaoDateSelector.value;
-                if (!dateStr) return;
-                const loading = document.getElementById('verificacao-loading');
-                const noData = document.getElementById('verificacao-no-data');
-                loading.style.display = 'block';
-                noData.style.display = 'none';
-                verificacaoTableBody.innerHTML = '';
-                try {
-                    const startDate = new Date(dateStr + 'T07:00:00');
-                    const endDate = new Date(dateStr + 'T07:00:00');
-                    endDate.setDate(endDate.getDate() + 1);
-                    const q = query(collection(db, "perdas"), where("timestamp", ">=", Timestamp.fromDate(startDate)), where("timestamp", "<", Timestamp.fromDate(endDate)), orderBy("timestamp", "desc"));
-                    const querySnapshot = await getDocs(q);
-                    if (querySnapshot.empty) {
-                        noData.style.display = 'block';
-                    } else {
-                        querySnapshot.forEach(doc => {
-                            renderVerificacaoRow({ id: doc.id, ...doc.data() });
-                        });
-                    }
-                } catch (error) {
-                    console.error("Erro ao buscar dados para verificação:", error);
-                    alert("Não foi possível carregar os lançamentos.");
-                } finally {
-                    loading.style.display = 'none';
-                }
-            }
-
             function renderVerificacaoRow(data) {
                 const row = document.createElement('tr');
                 row.className = 'hover:bg-slate-50';
@@ -623,20 +682,17 @@
                 lucide.createIcons();
             }
 
-            const confirmModal = document.getElementById('confirm-modal');
             let docIdToDelete = null;
-            verificacaoTableBody.addEventListener('click', (e) => {
-                const deleteBtn = e.target.closest('.delete-btn');
-                if (deleteBtn) {
-                    docIdToDelete = deleteBtn.dataset.id;
-                    confirmModal.classList.remove('hidden');
-                }
-            });
-            document.getElementById('confirm-modal-cancel-btn').addEventListener('click', () => {
+            const confirmModal = document.getElementById('confirm-modal');
+            const showConfirmModal = (id) => {
+                docIdToDelete = id;
+                confirmModal.classList.remove('hidden');
+            };
+            const hideConfirmModal = () => {
                 confirmModal.classList.add('hidden');
                 docIdToDelete = null;
-            });
-            document.getElementById('confirm-modal-ok-btn').addEventListener('click', async () => {
+            };
+            const executeDelete = async () => {
                 if (!docIdToDelete) return;
                 try {
                     await deleteDoc(doc(db, "perdas", docIdToDelete));
@@ -646,13 +702,19 @@
                     console.error("Erro ao excluir documento:", error);
                     alert(`Não foi possível excluir o lançamento: ${error.message}`);
                 } finally {
-                    confirmModal.classList.add('hidden');
-                    docIdToDelete = null;
+                    hideConfirmModal();
                 }
-            });
-
-            // --- Inicialização ---
-            fetchPlannedMachines();
+            };
+            
+            const setTodayDate = () => {
+                const todayString = getProductionDateString();
+                startDateSelector.value = todayString;
+                endDateSelector.value = todayString;
+                verificacaoDateSelector.value = todayString;
+            };
+            
+            // --- INICIALIZAÇÃO ---
+            init();
         });
     </script>
 </body>
