@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hokkaido Synchro - Controle de Perdas v2.6</title>
+    <title>Hokkaido Synchro - Controle de Perdas v2.7</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -106,7 +106,7 @@
                                 <label for="perdas" class="block text-sm font-medium text-slate-700">Perdas (Motivo do Refugo)</label>
                                 <select id="perdas" name="perdas" required class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
                                     <option value="N/A">Não se aplica / Sem refugo</option>
-                                    <option value="BOLHA">BOLHA</option><option value="CHUPAGEM">CHUPAGEM</option><option value="CONTAMINAÇÃO">CONTAMINAÇÃO</option><option value="DEGRADAÇÃO">DEGRADAÇÃO</option><option value="DEFORMAÇÃO">DEFORMAÇÃO</option><option value="EMPENAMENTO">EMPENAMENTO</option><option value="FALHA">FALHA</option><option value="FIAPO">FIAPO</option><option value="FORA DE COR">FORA DE COR</option><option value="GALHO PRESO">GALHO PRESO</option><option value="INÍCIO/ REÍNICIO">INÍCIO/ REÍNICIO</option><option value="JUNÇÃO">JUNÇÃO</option><option value="MANCHAS">MANCHAS</option><option value="MARCA D'ÁGUA">MARCA D'ÁGUA</option><option value="MARCA EXTRATOR">MARCA EXTRATOR</option><option value="MEDIDA FORA DO ESPECIFICADO">MEDIDA FORA DO ESPECIFICADO</option><option value="MOÍDO">MOÍDO</option><option value="PEÇÃS PERDIDAS">PEÇÃS PERDIDAS</option><option value="QUEIMA">QUEIMA</option><option value="REBARBA">REBARBA</option><option value="RISCOS">RISCOS</option><option value="SUJIDADE">SUJIDADE</option>
+                                    <option value="BOLHA">BOLHA</option><option value="CHUPAGEM">CHUPAGEM</option><option value="CONTAMINAÇÃO">CONTAMINAÇÃO</option><option value="DEGRADAÇÃO">DEGRADAÇÃO</option><option value="DEFORMAÇÃO">DEFORMAÇÃO</option><option value="EMPENAMENTO">EMPENAMENTO</option><option value="FALHA">FALHA</option><option value="FIAPO">FIAPO</option><option value="FORA DE COR">FORA DE COR</option><option value="GALHO PRESO">GALHO PRESO</option><option value="INÍCIO/ REÍNICIO">INÍCIO/ REÍNICIO</option><option value="JUNÇÃO">JUNÇÃO</option><option value="MANCHAS">MANCHAS</option><option value="MARCA D'ÁGUA">MARCA D'ÁGUA</option><option value="MARCA EXTRATOR">MARCA EXTRATOR</option><option value="MEDIDA FORA DO ESPECIFICADO">MEDIDA FORA DO ESPECIFICADO</option><option value="MOÍDO">MOÍDO</option><option value="PEÇAS PERDIDAS">PEÇAS PERDIDAS</option><option value="QUEIMA">QUEIMA</option><option value="REBARBA">REBARBA</option><option value="RISCOS">RISCOS</option><option value="SUJIDADE">SUJIDADE</option>
                                 </select>
                             </div>
                         </div>
@@ -303,8 +303,9 @@
             let plannedMachinesData = [];
             let fullDashboardData = []; 
             let currentParetoMode = 'refugo';
+            let paretoChartInstance = null;
+            let turnoChartInstance = null;
 
-            // --- Seletores de DOM ---
             const machineSelect = document.getElementById('maquina');
             const opInput = document.getElementById('op');
             const form = document.getElementById('production-form');
@@ -320,7 +321,6 @@
             const refreshVerificacaoBtn = document.getElementById('refresh-verificacao-btn');
             const verificacaoTableBody = document.getElementById('verificacao-table-body');
             
-            // --- Funções de Integração ---
             async function fetchPlannedMachines() {
                 machineSelect.innerHTML = `<option value="">A carregar máquinas...</option>`;
                 machineSelect.disabled = true;
@@ -362,7 +362,6 @@
                 opInput.value = machinePlan ? machinePlan.product || '' : '';
             });
 
-            // --- Lógica do Formulário ---
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const submitButton = document.getElementById('submit-button');
@@ -400,7 +399,6 @@
                 }
             });
 
-            // --- Lógica Geral das Abas ---
             tabButtons.forEach(button => {
                 button.addEventListener('click', () => {
                     const tabId = button.dataset.tab;
@@ -414,7 +412,6 @@
                 });
             });
 
-            // --- Lógica do Dashboard ---
             const setTodayDate = () => {
                 const todayString = getProductionDateString();
                 startDateSelector.value = todayString;
@@ -437,6 +434,7 @@
                 paretoRefugoBtn.classList.remove('active');
                 processAndRenderDashboard(fullDashboardData);
             });
+
             async function loadDashboardData() {
                 const dashboardContent = document.getElementById('dashboard-content');
                 const dashboardLoading = document.getElementById('dashboard-loading');
@@ -492,8 +490,18 @@
                 const kpiRefugo = document.getElementById('kpi-refugo');
                 const kpiTriagem = document.getElementById('kpi-triagem');
                 const kpiBorras = document.getElementById('kpi-borras');
-                let paretoChartInstance = null;
-                let turnoChartInstance = null;
+                
+                const noDataMessage = (ctx) => {
+                    if (!ctx) return;
+                    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                    ctx.save();
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillStyle = '#64748b';
+                    ctx.font = "14px 'Inter', sans-serif";
+                    ctx.fillText('Sem dados para a seleção atual.', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                    ctx.restore();
+                };
 
                 if (!filteredData || filteredData.length === 0) {
                     kpiProducao.textContent = '0';
@@ -502,27 +510,14 @@
                     kpiBorras.textContent = '0.00 kg';
                     if (paretoChartInstance) paretoChartInstance.destroy();
                     if (turnoChartInstance) turnoChartInstance.destroy();
-                    const noDataMessage = (ctx) => {
-                        if (!ctx) return;
-                        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-                        ctx.save();
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-                        ctx.fillStyle = '#64748b';
-                        ctx.font = "14px 'Inter', sans-serif";
-                        ctx.fillText('Sem dados para a seleção atual.', ctx.canvas.width / 2, ctx.canvas.height / 2);
-                        ctx.restore();
-                    };
                     noDataMessage(document.getElementById('paretoChart')?.getContext('2d'));
                     noDataMessage(document.getElementById('turnoChart')?.getContext('2d'));
                     return;
                 }
-
                 const totalProduzido = filteredData.reduce((sum, row) => sum + Number(row.produzido || 0), 0);
                 const totalRefugo = filteredData.reduce((sum, row) => sum + Number(row.refugo || 0), 0);
                 const totalTriagem = filteredData.reduce((sum, row) => sum + Number(row.triagem || 0), 0);
                 const totalBorras = filteredData.reduce((sum, row) => sum + Number(row.borras || 0), 0);
-                
                 kpiProducao.textContent = totalProduzido.toLocaleString('pt-BR');
                 kpiRefugo.textContent = `${totalRefugo.toFixed(2)} kg`;
                 kpiTriagem.textContent = totalTriagem.toLocaleString('pt-BR');
@@ -575,7 +570,6 @@
                 turnoChartInstance = new Chart(ctx, { type: 'bar', data: { labels: Object.keys(data).sort(), datasets: [{ label: 'Refugo (kg)', data: Object.keys(data).sort().map(turno => data[turno].refugo), backgroundColor: 'rgba(239, 68, 68, 0.7)', borderColor: 'rgba(239, 68, 68, 1)', borderWidth: 1, borderRadius: 4, }, { label: 'Borras (kg)', data: Object.keys(data).sort().map(turno => data[turno].borras), backgroundColor: 'rgba(34, 197, 94, 0.7)', borderColor: 'rgba(34, 197, 94, 1)', borderWidth: 1, borderRadius: 4, }] }, options: { scales: { x: { stacked: false }, y: { stacked: false, beginAtZero: true } }, responsive: true, maintainAspectRatio: true } });
             }
             
-            // --- Lógica da Aba de Verificação ---
             refreshVerificacaoBtn.addEventListener('click', loadVerificacaoData);
             
             async function loadVerificacaoData() {
@@ -629,7 +623,6 @@
                 lucide.createIcons();
             }
 
-            // --- Lógica de Exclusão ---
             const confirmModal = document.getElementById('confirm-modal');
             let docIdToDelete = null;
             verificacaoTableBody.addEventListener('click', (e) => {
