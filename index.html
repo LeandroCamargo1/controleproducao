@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hokkaido Synchro - OEE & Controle de Perdas v3.1</title>
+    <title>Hokkaido Synchro - OEE & Controle de Perdas v3.3</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -98,7 +98,7 @@
                             </div>
                             <div>
                                 <label for="produzido" class="block text-sm font-medium text-slate-700">Produção (peças)</label>
-                                <input type="number" id="produzido" name="produzido" min="0" required class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
+                                <input type="number" id="produzido" name="produzido" min="0" value="0" class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
                             </div>
                              <div>
                                 <label for="triagem" class="block text-sm font-medium text-slate-700">Peças para Triagem</label>
@@ -116,7 +116,36 @@
                                 <label for="perdas" class="block text-sm font-medium text-slate-700">Perdas (Motivo do Refugo)</label>
                                 <select id="perdas" name="perdas" required class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
                                     <option value="N/A">Não se aplica / Sem refugo</option>
-                                    <option value="BOLHA">BOLHA</option><option value="CHUPAGEM">CHUPAGEM</option><option value="CONTAMINAÇÃO">CONTAMINAÇÃO</option><option value="DEGRADAÇÃO">DEGRADAÇÃO</option><option value="DEFORMAÇÃO">DEFORMAÇÃO</option><option value="EMPENAMENTO">EMPENAMENTO</option><option value="FALHA">FALHA</option><option value="FIAPO">FIAPO</option><option value="FORA DE COR">FORA DE COR</option><option value="GALHO PRESO">GALHO PRESO</option><option value="INÍCIO/ REÍNICIO">INÍCIO/ REÍNICIO</option><option value="JUNÇÃO">JUNÇÃO</option><option value="MANCHAS">MANCHAS</option><option value="MARCA D'ÁGUA">MARCA D'ÁGUA</option><option value="MARCA EXTRATOR">MARCA EXTRATOR</option><option value="MEDIDA FORA DO ESPECIFICADO">MEDIDA FORA DO ESPECIFICADO</option><option value="MOÍDO">MOÍDO</option><option value="PEÇAS PERDIDAS">PEÇAS PERDIDAS</option><option value="QUEIMA">QUEIMA</option><option value="REBARBA">REBARBA</option><option value="RISCOS">RISCOS</option><option value="SUJIDADE">SUJIDADE</option>
+                                    <optgroup label="MÁQUINA">
+                                        <option value="01 - LIMPEZA">01 - LIMPEZA</option>
+                                        <option value="02 - INÍCIO DE PRODUÇÃO">02 - INÍCIO DE PRODUÇÃO</option>
+                                        <option value="03 - QUEDA DE ENERGIA">03 - QUEDA DE ENERGIA</option>
+                                        <option value="04 - PARADA EMERGENCIAL">04 - PARADA EMERGENCIAL</option>
+                                        <option value="05 - VAZAMENTO DE ÓLEO">05 - VAZAMENTO DE ÓLEO</option>
+                                        <option value="06 - AUSÊNCIA DE PERIFÉRICOS">06 - AUSÊNCIA DE PERIFÉRICOS</option>
+                                        <option value="07 - FALTA DE MATÉRIA PRIMA">07 - FALTA DE MATÉRIA PRIMA</option>
+                                        <option value="08 - SUJIDADE (GRAXA, ÁGUA, ETC)">08 - SUJIDADE (GRAXA, ÁGUA, ETC)</option>
+                                    </optgroup>
+                                    <optgroup label="MOLDE">
+                                        <option value="11 - CORRETIVA">11 - CORRETIVA</option>
+                                        <option value="12 - LIMPEZA DE TIPS">12 - LIMPEZA DE TIPS</option>
+                                        <option value="13 - TROCA DE LÂMINA">13 - TROCA DE LÂMINA</option>
+                                        <option value="14 - ABERTURA DE CAVIDADES">14 - ABERTURA DE CAVIDADES</option>
+                                        <option value="15 - MARCA D'ÁGUA">15 - MARCA D'ÁGUA</option>
+                                        <option value="16 - MARCA DE EXTRATOR">16 - MARCA DE EXTRATOR</option>
+                                        <option value="17 - TRY-OUT">17 - TRY-OUT</option>
+                                    </optgroup>
+                                    <optgroup label="PROCESSO">
+                                        <option value="21 - FALHA DE INJEÇÃO">21 - FALHA DE INJEÇÃO</option>
+                                        <option value="22 - CONTAMINAÇÃO">22 - CONTAMINAÇÃO</option>
+                                        <option value="23 - REBARBA">23 - REBARBA</option>
+                                        <option value="24 - TROCA DE COR">24 - TROCA DE COR</option>
+                                        <option value="25 - FORA DE COR">25 - FORA DE COR</option>
+                                        <option value="26 - PONTO DE INJEÇÃO ALTO">26 - PONTO DE INJEÇÃO ALTO</option>
+                                        <option value="27 - FALTA DE OPERADOR">27 - FALTA DE OPERADOR</option>
+                                        <option value="28 - FORA DO DIMENSIONAL">28 - FORA DO DIMENSIONAL</option>
+                                        <option value="29 - AJUSTE DE PROCESSO">29 - AJUSTE DE PROCESSO</option>
+                                    </optgroup>
                                 </select>
                             </div>
                         </div>
@@ -132,7 +161,6 @@
                 </main>
             </div>
             
-            <!-- NOVA ABA: LANÇAMENTO DE PARADA -->
             <div id="parada-tab" class="tab-pane" style="display: none;">
                 <main class="w-full max-w-2xl mx-auto bg-white p-6 md:p-8 rounded-lg shadow-lg border-t-4 border-amber-500">
                     <h2 class="text-2xl font-bold mb-4 flex items-center gap-2 text-slate-800 border-b-2 border-slate-100 pb-3"><i data-lucide="timer-off" class="text-amber-500"></i>Lançar Parada de Máquina</h2>
@@ -263,7 +291,6 @@
                             </div>
                             <i data-lucide="repeat" class="w-5 h-5 text-slate-400"></i>
                         </div>
-                         <!-- NOVO KPI: TEMPO DE PARADA TOTAL -->
                         <div class="bg-white p-5 rounded-lg shadow-lg flex items-center gap-4">
                             <div class="p-3 bg-orange-100 rounded-full"><i data-lucide="clock" class="w-7 h-7 text-orange-600"></i></div>
                             <div>
@@ -279,12 +306,21 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- NOVO GRÁFICO: LINHA DO TEMPO DA PRODUÇÃO -->
+                    <div id="production-timeline-container" class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-indigo-500 relative">
+                        <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-800 border-b-2 border-slate-100 pb-3"><i data-lucide="line-chart" class="text-indigo-500"></i>Produção por Hora</h2>
+                        <canvas id="productionTimelineChart"></canvas>
+                        <div id="timeline-chart-message" class="hidden text-center py-10 text-slate-500">
+                             <p>Selecione uma única máquina no filtro para visualizar a linha do tempo.</p>
+                        </div>
+                    </div>
+                    
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-blue-500 relative">
                             <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-800 border-b-2 border-slate-100 pb-3"><i data-lucide="pie-chart" class="text-blue-500"></i>Análise de OEE</h2>
                              <canvas id="oeeChart"></canvas>
                         </div>
-                        <!-- NOVO GRÁFICO: PARETO DE PARADAS -->
                         <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-orange-500 relative">
                             <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-800 border-b-2 border-slate-100 pb-3"><i data-lucide="bar-chart-3" class="text-orange-500"></i>Principais Motivos de Parada</h2>
                             <canvas id="paretoParadaChart"></canvas>
@@ -408,7 +444,7 @@
             let plannedMachinesData = [];
             let fullDashboardData = { perdas: [], paradas: [] };
             let currentParetoMode = 'refugo';
-            let paretoChartInstance, turnoChartInstance, oeeChartInstance, paretoParadaChartInstance;
+            let paretoChartInstance, oeeChartInstance, paretoParadaChartInstance, productionTimelineChartInstance;
             let productDataMap = new Map();
             let kpiValues = {};
             let refugoViewMode = 'kg';
@@ -491,6 +527,18 @@
                  const formData = new FormData(formElement);
                  const dataToSave = Object.fromEntries(formData.entries());
 
+                 // Garante que pelo menos um dos campos de perda/produção tenha valor
+                 if(collectionName === 'perdas') {
+                     const { produzido, refugo, borras, triagem } = dataToSave;
+                     if(Number(produzido) === 0 && Number(refugo) === 0 && Number(borras) === 0 && Number(triagem) === 0) {
+                         status.textContent = 'Preencha ao menos um campo: Produção, Refugo, Borras ou Triagem.';
+                         status.className = 'text-sm font-semibold h-5 text-center text-red-600';
+                         button.disabled = false;
+                         buttonText.textContent = originalButtonText;
+                         return;
+                     }
+                 }
+
                  // Converte campos numéricos
                  for (const key in dataToSave) {
                     if (!isNaN(dataToSave[key]) && dataToSave[key] !== '' && typeof dataToSave[key] === 'string') {
@@ -529,6 +577,7 @@
                      if(formElement === productionForm) {
                         opInput.value = '';
                         machineSelect.value = '';
+                        document.getElementById('produzido').value = '0';
                      } else {
                         maquinaParadaSelect.value = '';
                      }
@@ -754,6 +803,7 @@
                 kpiValues = { producao: totalProduzido, refugoKg: totalRefugoKg, refugoPcs: totalRefugoPcs, triagem: totalTriagem, borras: totalBorras, parada: totalParadaMin };
                 updateKpiCards();
                 calculateAndDisplayOEE(filteredPerdas, filteredParadas);
+                renderProductionTimelineChart(filteredPerdas, selectedMachine);
 
                 if (currentParetoMode === 'refugo') {
                     document.getElementById('pareto-title').innerHTML = `<i data-lucide="bar-chart-3" class="text-red-500"></i>Principais Motivos de Refugo`;
@@ -910,6 +960,58 @@
                     }
                 });
             }
+
+            function renderProductionTimelineChart(data, selectedMachine) {
+                const container = document.getElementById('production-timeline-container');
+                const canvas = document.getElementById('productionTimelineChart');
+                const message = document.getElementById('timeline-chart-message');
+
+                if (selectedMachine === 'total') {
+                    canvas.style.display = 'none';
+                    message.style.display = 'block';
+                    if (productionTimelineChartInstance) productionTimelineChartInstance.destroy();
+                    return;
+                }
+                
+                canvas.style.display = 'block';
+                message.style.display = 'none';
+
+                const labels = ['07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '00', '01', '02', '03', '04', '05', '06'].map(h => h+':00');
+                const hourlyData = new Array(24).fill(0);
+
+                data.forEach(record => {
+                    if (record.produzido > 0) {
+                        const hour = record.timestamp.toDate().getHours();
+                        const index = hour >= 7 ? hour - 7 : hour + 17;
+                        if (index >= 0 && index < 24) {
+                            hourlyData[index] += record.produzido;
+                        }
+                    }
+                });
+                
+                const ctx = canvas.getContext('2d');
+                if (productionTimelineChartInstance) productionTimelineChartInstance.destroy();
+                productionTimelineChartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Produção por Hora (peças)',
+                            data: hourlyData,
+                            borderColor: 'rgba(79, 70, 229, 1)',
+                            backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                            fill: true,
+                            tension: 0.2
+                        }]
+                    },
+                    options: {
+                        scales: { y: { beginAtZero: true } },
+                        plugins: { legend: { display: false } },
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
             
             function renderVerificacaoRow(data) {
                 const row = document.createElement('tr');
@@ -982,4 +1084,5 @@
     </script>
 </body>
 </html>
+
 
