@@ -307,10 +307,12 @@
                         </div>
                     </div>
                     
-                    <!-- NOVO GRÁFICO: LINHA DO TEMPO DA PRODUÇÃO -->
+                    <!-- GRÁFICO DE LINHA: ALTURA AJUSTADA -->
                     <div id="production-timeline-container" class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-indigo-500 relative">
                         <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-800 border-b-2 border-slate-100 pb-3"><i data-lucide="line-chart" class="text-indigo-500"></i>Produção por Hora</h2>
-                        <canvas id="productionTimelineChart"></canvas>
+                        <div class="relative h-72">
+                             <canvas id="productionTimelineChart"></canvas>
+                        </div>
                         <div id="timeline-chart-message" class="hidden text-center py-10 text-slate-500">
                              <p>Selecione uma única máquina no filtro para visualizar a linha do tempo.</p>
                         </div>
