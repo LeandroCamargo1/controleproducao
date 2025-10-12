@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hokkaido Synchro - OEE & Controle de Perdas v4.1</title>
+    <title>Hokkaido Synchro - OEE & Controle de Perdas v3.3</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -53,10 +53,7 @@
 
         <div class="mb-6 border-b border-slate-300">
             <nav class="flex space-x-6 overflow-x-auto">
-                <button class="tab-btn py-3 px-1 text-slate-600 hover:text-cyan-600 border-b-2 border-transparent transition-all duration-300 active whitespace-nowrap" data-tab="planejamento">
-                    <i data-lucide="clipboard-list" class="w-4 h-4 inline-block mr-2"></i>Planejamento
-                </button>
-                <button class="tab-btn py-3 px-1 text-slate-600 hover:text-cyan-600 border-b-2 border-transparent transition-all duration-300 whitespace-nowrap" data-tab="lancamento">
+                <button class="tab-btn py-3 px-1 text-slate-600 hover:text-cyan-600 border-b-2 border-transparent transition-all duration-300 active whitespace-nowrap" data-tab="lancamento">
                     <i data-lucide="package-plus" class="w-4 h-4 inline-block mr-2"></i>Produção & Perdas
                 </button>
                 <button class="tab-btn py-3 px-1 text-slate-600 hover:text-cyan-600 border-b-2 border-transparent transition-all duration-300 whitespace-nowrap" data-tab="parada">
@@ -72,82 +69,7 @@
         </div>
 
         <div id="tab-content">
-            <!-- ABA: Planejamento -->
-            <div id="planejamento-tab" class="tab-pane active fade-in">
-                 <main class="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                    <div class="lg:col-span-2 bg-white p-6 md:p-8 rounded-lg shadow-lg border-t-4 border-purple-500">
-                        <h2 class="text-2xl font-bold mb-4 flex items-center gap-2 text-slate-800 border-b-2 border-slate-100 pb-3"><i data-lucide="clipboard-list" class="text-purple-500"></i>Planejar Produção do Dia</h2>
-                        <form id="planning-form" class="space-y-5 pt-4">
-                           <div>
-                                <label for="planning-date-selector" class="block text-sm font-medium text-slate-700">Data do Planejamento</label>
-                                <input type="date" id="planning-date-selector" name="date" required class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 transition">
-                           </div>
-                           <div>
-                                <label for="planning-machine" class="block text-sm font-medium text-slate-700">Máquina</label>
-                                <select id="planning-machine" name="machine" required class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 transition"></select>
-                           </div>
-                           <div>
-                                <label for="planning-client" class="block text-sm font-medium text-slate-700">Cliente</label>
-                                <select id="planning-client" name="client" required class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 transition"></select>
-                           </div>
-                           <div>
-                                <label for="planning-product" class="block text-sm font-medium text-slate-700">Produto</label>
-                                <select id="planning-product" name="product" required class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 transition" disabled>
-                                    <option value="">Selecione um cliente</option>
-                                </select>
-                           </div>
-                           <div class="grid grid-cols-3 gap-4">
-                               <div>
-                                   <label for="budgeted-cycle" class="block text-sm font-medium text-slate-700">Ciclo (s)</label>
-                                   <input type="number" id="budgeted-cycle" name="budgeted_cycle" required min="0.1" step="0.1" class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm bg-slate-50" readonly>
-                               </div>
-                               <div>
-                                   <label for="mold-cavities" class="block text-sm font-medium text-slate-700">Cav.</label>
-                                   <input type="number" id="mold-cavities" name="mold_cavities" required min="1" step="1" class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm bg-slate-50" readonly>
-                               </div>
-                                <div>
-                                   <label for="piece-weight" class="block text-sm font-medium text-slate-700">Peso (g)</label>
-                                   <input type="number" id="piece-weight" name="piece_weight" required min="0.01" step="0.01" class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm">
-                               </div>
-                           </div>
-                           <hr class="border-slate-200 my-2">
-                           <div class="flex flex-col items-center gap-4">
-                                <button type="submit" id="planning-submit-button" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:bg-slate-400 disabled:cursor-not-allowed shadow-sm hover:shadow-md">
-                                    <i data-lucide="plus-circle" class="w-5 h-5"></i>
-                                    <span>Adicionar ao Plano</span>
-                                </button>
-                                <div id="planning-status-message" class="text-sm font-semibold h-5 text-center"></div>
-                           </div>
-                        </form>
-                    </div>
-                    <div class="lg:col-span-3 bg-white p-6 md:p-8 rounded-lg shadow-lg">
-                        <h2 class="text-2xl font-bold mb-4 flex items-center gap-2 text-slate-800 border-b-2 border-slate-100 pb-3"><i data-lucide="list-checks" class="text-slate-600"></i>Itens Planejados para a Data</h2>
-                        <div id="planning-list-container" class="overflow-x-auto pt-4">
-                            <table class="min-w-full divide-y divide-slate-200">
-                                <thead class="bg-slate-50">
-                                    <tr>
-                                        <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Máquina</th>
-                                        <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Produto</th>
-                                        <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Ciclo</th>
-                                        <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Cav.</th>
-                                        <th class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">Ação</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="planning-table-body" class="bg-white divide-y divide-slate-200"></tbody>
-                            </table>
-                            <div id="planning-loading" class="text-center py-10" style="display: none;">
-                                <i data-lucide="loader-2" class="w-12 h-12 animate-spin text-purple-600 mx-auto"></i>
-                            </div>
-                            <div id="planning-no-data" class="text-center py-10 text-slate-500" style="display: none;">
-                                <p>Nenhum item planejado para a data selecionada.</p>
-                            </div>
-                        </div>
-                    </div>
-                </main>
-            </div>
-
-            <!-- ABA: Lançamento de Produção e Perdas -->
-            <div id="lancamento-tab" class="tab-pane fade-in" style="display: none;">
+            <div id="lancamento-tab" class="tab-pane active fade-in">
                 <main class="w-full max-w-2xl mx-auto bg-white p-6 md:p-8 rounded-lg shadow-lg border-t-4 border-cyan-500">
                     <h2 class="text-2xl font-bold mb-4 flex items-center gap-2 text-slate-800 border-b-2 border-slate-100 pb-3"><i data-lucide="package-plus" class="text-cyan-600"></i>Lançar Produção e Perdas do Turno</h2>
                     <form id="production-form" class="space-y-5 pt-4">
@@ -159,7 +81,7 @@
                             <div>
                                 <label for="maquina" class="block text-sm font-medium text-slate-700">Máquina</label>
                                 <select id="maquina" name="maquina" required class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 transition" disabled>
-                                    <option value="">Carregando plano do dia...</option>
+                                    <option value="">A carregar máquinas do plano...</option>
                                 </select>
                             </div>
                             <div>
@@ -239,8 +161,7 @@
                 </main>
             </div>
             
-            <!-- ABA: Lançamento de Parada -->
-            <div id="parada-tab" class="tab-pane fade-in" style="display: none;">
+            <div id="parada-tab" class="tab-pane" style="display: none;">
                 <main class="w-full max-w-2xl mx-auto bg-white p-6 md:p-8 rounded-lg shadow-lg border-t-4 border-amber-500">
                     <h2 class="text-2xl font-bold mb-4 flex items-center gap-2 text-slate-800 border-b-2 border-slate-100 pb-3"><i data-lucide="timer-off" class="text-amber-500"></i>Lançar Parada de Máquina</h2>
                     <form id="parada-form" class="space-y-5 pt-4">
@@ -248,7 +169,7 @@
                             <div>
                                 <label for="maquina-parada" class="block text-sm font-medium text-slate-700">Máquina</label>
                                 <select id="maquina-parada" name="maquina" required class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500 transition" disabled>
-                                    <option value="">Carregando plano do dia...</option>
+                                    <option value="">A carregar...</option>
                                 </select>
                             </div>
                             <div>
@@ -294,8 +215,7 @@
                 </main>
             </div>
 
-            <!-- ABA: Dashboard -->
-            <div id="dashboard-tab" class="tab-pane fade-in" style="display: none;">
+            <div id="dashboard-tab" class="tab-pane" style="display: none;">
                  <div class="mb-6 flex flex-col xl:flex-row items-center justify-between gap-4 bg-white p-4 rounded-lg shadow-md">
                     <div class="w-full flex flex-col md:flex-row items-center gap-4">
                         <div class="flex-1 flex items-center gap-2">
@@ -387,6 +307,7 @@
                         </div>
                     </div>
                     
+                    <!-- GRÁFICO DE LINHA: ALTURA AJUSTADA -->
                     <div id="production-timeline-container" class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-indigo-500 relative">
                         <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-800 border-b-2 border-slate-100 pb-3"><i data-lucide="line-chart" class="text-indigo-500"></i>Produção por Hora</h2>
                         <div class="relative h-72">
@@ -429,8 +350,7 @@
                 </div>
             </div>
 
-            <!-- ABA: Verificação de Dados -->
-            <div id="verificacao-tab" class="tab-pane fade-in" style="display: none;">
+            <div id="verificacao-tab" class="tab-pane" style="display: none;">
                  <div class="mb-6 flex flex-col md:flex-row items-center justify-between gap-4 bg-white p-4 rounded-lg shadow-md">
                       <h2 class="text-xl font-bold text-slate-800 whitespace-nowrap">Verificar e Excluir Lançamentos</h2>
                       <div class="w-full flex flex-col md:flex-row items-center gap-4">
@@ -470,7 +390,6 @@
         </div>
     </div>
     
-    <!-- Modal de Confirmação -->
     <div id="confirm-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 z-50 flex justify-center items-center p-4">
          <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm m-4 text-center">
             <div class="flex justify-center mb-4">
@@ -489,7 +408,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, query, where, Timestamp, doc, deleteDoc, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, query, where, Timestamp, doc, deleteDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyDJR5gs6yHGnkeYVknnV8wWNodrHPZmAYs",
@@ -499,6 +418,9 @@
             messagingSenderId: "436420480433",
             appId: "1:436420480433:web:f2386beaa50a81cf3f4190"
         };
+        
+        const SUPABASE_URL = 'https://hrukbkrzmabdrjyvpmff.supabase.co'; 
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhydWtia3J6bWFiZHJqeXZwbWZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MzI3OTEsImV4cCI6MjA3NTAwODc5MX0.Auiqvoq-w8EKLvc-KVysAk697uI2o-lEK8zh2cU7LKI';
 
         let db;
         try {
@@ -509,31 +431,27 @@
             alert("Erro fatal: Não foi possível conectar à base de dados.");
         }
 
-        function getProductionDateString(date = new Date()) {
-            const localDate = new Date(date);
-            const currentHour = localDate.getHours();
+        function getProductionDateString() {
+            const now = new Date();
+            const currentHour = now.getHours();
             if (currentHour < 7) { 
-                localDate.setDate(localDate.getDate() - 1);
+                now.setDate(now.getDate() - 1);
             }
-            const offset = localDate.getTimezoneOffset();
-            return new Date(localDate.getTime() - (offset * 60 * 1000)).toISOString().split('T')[0];
+            const offset = now.getTimezoneOffset();
+            return new Date(now.getTime() - (offset * 60 * 1000)).toISOString().split('T')[0];
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             // --- VARIÁVEIS GLOBAIS ---
-            let productDatabase = [{"client":"SILGAN","name":"ATUADOR DISPENSADOR","cavities":32,"cycle":30.2},{"client":"SILGAN","name":"ATUADOR SPRAY","cavities":32,"cycle":30.4},{"client":"SILGAN","name":"SOBRETAMPA","cavities":16,"cycle":10.5},{"client":"SILGAN","name":"RETENTOR DA MOLA 24 CAV","cavities":24,"cycle":15.5},{"client":"SILGAN","name":"ROSCA M300","cavities":32,"cycle":33},{"client":"SILGAN","name":"ACUMULADOR M300","cavities":48,"cycle":25},{"client":"SILGAN","name":"ROSCA BAIXA P2000","cavities":48,"cycle":33},{"client":"SILGAN","name":"ANEL TRAVA BRILHANTE / TEXTURIZADA","cavities":16,"cycle":13.4},{"client":"SILGAN","name":"BUCHA P2000","cavities":32,"cycle":16},{"client":"SILGAN","name":"ACUMULADOR P2000","cavities":32,"cycle":19},{"client":"SILGAN","name":"ROSCA ALTA P2000 28/410 FOSCA / ESTRIADA","cavities":24,"cycle":21.15},{"client":"SILGAN","name":"ROSCA ALTA P2000 24/410 LISA","cavities":24,"cycle":21.15},{"client":"SILGAN","name":"ATUADOR P2000","cavities":24,"cycle":19},{"client":"SILGAN","name":"CLIKIT 17","cavities":16,"cycle":16},{"client":"SILGAN","name":"RETENTOR DA MOLA 64 CAV","cavities":64,"cycle":20.5},{"client":"SILGAN","name":"ROSCA MKIV 18/415","cavities":48,"cycle":40},{"client":"SILGAN","name":"ROSCA MKIV 20/410","cavities":48,"cycle":40},{"client":"SILGAN","name":"ROSCA MKIV 22/415","cavities":48,"cycle":40},{"client":"SILGAN","name":"ROSCA MKIV 24/410","cavities":48,"cycle":40},{"client":"APTAR","name":"CAPA KAIAK 8 CAVIDADES","cavities":8,"cycle":16},{"client":"APTAR","name":"CAPA KAIAK 16 CAVIDADES","cavities":16,"cycle":16},{"client":"APTAR","name":"CLIP K2","cavities":16,"cycle":16},{"client":"APTAR","name":"CLIP Q3","cavities":8,"cycle":17},{"client":"APTAR","name":"ROSCA SENTIDOS - MOLDE 1 (A)","cavities":24,"cycle":36},{"client":"APTAR","name":"ROSCA SENTIDOS - MOLDE 2 (D)","cavities":24,"cycle":36},{"client":"APTAR","name":"ATUADOR SENTIDOS / POEMA","cavities":24,"cycle":25.5},{"client":"APTAR","name":"ROSCA 24/410 ESTRIADA / LISA - APTAR","cavities":16,"cycle":18},{"client":"APTAR","name":"ATUADOR CLASSIC","cavities":32,"cycle":20},{"client":"APTAR","name":"TAMPA EUROMIST","cavities":32,"cycle":12},{"client":"ÓRICA","name":"CLIP","cavities":6,"cycle":18},{"client":"ÓRICA","name":"CONECTOR","cavities":4,"cycle":30},{"client":"PARKER","name":"TAMPA BEGE SUPERIOR","cavities":2,"cycle":40},{"client":"PARKER","name":"TAMPA BEGE INFERIOR","cavities":2,"cycle":40},{"client":"PARKER","name":"BOCAL P/ FILTRO / PISTÃO","cavities":4,"cycle":23},{"client":"PARKER","name":"CÔNICO","cavities":1,"cycle":60},{"client":"PARKER","name":"TURBINA 1","cavities":1,"cycle":60},{"client":"PARKER","name":"TURBINA 2","cavities":1,"cycle":60},{"client":"PARKER","name":"ADAPTADOR","cavities":2,"cycle":18},{"client":"PARKER","name":"TAMPA PLÁSTICA S/ FURO","cavities":4,"cycle":21},{"client":"PARKER","name":"TAMPA PLÁSTICA C/ FURO","cavities":4,"cycle":21},{"client":"PARKER","name":"SUPORTE DO COPO - 6 CAVS - NOVO","cavities":6,"cycle":50},{"client":"PARKER","name":"SUPORTE ESCAL 600","cavities":4,"cycle":50},{"client":"PARKER","name":"SUPORTE R260","cavities":4,"cycle":50},{"client":"PARKER","name":"TAMPA 4 CAVIDADES","cavities":4,"cycle":50},{"client":"PARKER","name":"TAMPA 5923","cavities":4,"cycle":40},{"client":"PARKER","name":"TAMPA 5831","cavities":4,"cycle":35},{"client":"PARKER","name":"COROA P/ FILTRO","cavities":2,"cycle":18},{"client":"PARKER","name":"PLUG 1/4","cavities":1,"cycle":20},{"client":"PARKER","name":"PUXADOR COM BOMBA","cavities":2,"cycle":60},{"client":"PARKER","name":"PLUG 1/2","cavities":1,"cycle":20},{"client":"PARKER","name":"CONJUNTO TAMPÃO","cavities":2,"cycle":20},{"client":"PARKER","name":"PLUG DO DRENO","cavities":2,"cycle":30},{"client":"PARKER","name":"CORPO DO DRENO","cavities":2,"cycle":50},{"client":"PARKER","name":"TAMPÃO PLÁSTICO","cavities":4,"cycle":18},{"client":"PARKER","name":"SUPORTE USINADO INJETADO","cavities":2,"cycle":30.4},{"client":"INDUSMACK","name":"SUPORTE REDONDO 3/4\"","cavities":6,"cycle":20},{"client":"INDUSMACK","name":"BOCAL I2","cavities":4,"cycle":80},{"client":"INDUSMACK","name":"BOCAL I3","cavities":4,"cycle":80},{"client":"INDUSMACK","name":"BOCAL I4","cavities":4,"cycle":80},{"client":"INDUSMACK","name":"BOCAL I5","cavities":4,"cycle":80},{"client":"INDUSMACK","name":"BOCAL I6","cavities":4,"cycle":80},{"client":"INDUSMACK","name":"SUPORTE DA MANGUEIRA","cavities":4,"cycle":40},{"client":"INDUSMACK","name":"BICO ENTRADA (ESPIGÃO)","cavities":8,"cycle":40},{"client":"INDUSMACK","name":"SUPORTE REDONDO 1\"","cavities":4,"cycle":30},{"client":"GERDAU","name":"CARRETEL","cavities":1,"cycle":60},{"client":"GERDAU","name":"TRAVA DO CARRETEL","cavities":2,"cycle":22},{"client":"CSN","name":"FACE INTERNA","cavities":1,"cycle":42},{"client":"JORNADA","name":"FACE EXTERNA","cavities":1,"cycle":42},{"client":"JORNADA","name":"TAMPÃO","cavities":1,"cycle":42},{"client":"HOKKAIDO","name":"V- 30 CINZA","cavities":4,"cycle":26},{"client":"HOKKAIDO","name":"R - 120 - VERDE","cavities":8,"cycle":26},{"client":"HOKKAIDO","name":"L - 90 - AMARELO","cavities":8,"cycle":26},{"client":"HOKKAIDO","name":"X - 360 - MARROM","cavities":4,"cycle":26},{"client":"HOKKAIDO","name":"T - 180/90 - AZUL","cavities":8,"cycle":26},{"client":"HOKKAIDO","name":"I - 180 - VERMELHO","cavities":8,"cycle":26},{"client":"HOKKAIDO","name":"TAMPA DO POTE DO SORVETE","cavities":1,"cycle":9},{"client":"HOKKAIDO","name":"POTE DO SORVETE","cavities":1,"cycle":9},{"client":"SUNVISOR","name":"PRATO DESCARTÁVEL","cavities":4,"cycle":9},{"client":"SUNVISOR","name":"COMEDOR CATBOWL","cavities":1,"cycle":45},{"client":"LH COLUS","name":"BASE TRIANGULAR - KG3 - SK4647","cavities":1,"cycle":60},{"client":"LH COLUS","name":"JUNÇÃO SEM FURO - KG2 - SK4732","cavities":1,"cycle":60},{"client":"LH COLUS","name":"CORREDIÇA FUNDO VAZADO 6M SEM FURO - KG 4B - SK4763","cavities":1,"cycle":60},{"client":"LH COLUS","name":"CORREDIÇA FUNDO VAZADO 3M SEM FURO - KG 1B - SK4764","cavities":1,"cycle":60},{"client":"LH COLUS","name":"FIXADOR FUNDO FECHADO 3M SEM FURO - KG 1A - SK4766","cavities":1,"cycle":60},{"client":"LH COLUS","name":"FIXADOR FUNDO FECHADO 6M SEM FURO - KG 4A - SK4769","cavities":1,"cycle":60},{"client":"LH COLUS","name":"MANOPLA MACA (HANDLER)","cavities":1,"cycle":60},{"client":"LH COLUS","name":"SHIM SUPPORT LITTER (SUPORTE CALÇO MACA)","cavities":1,"cycle":60},{"client":"LH COLUS","name":"CEILING RING NYLON","cavities":1,"cycle":30},{"client":"LH COLUS","name":"BARRA TRIPLA CORREDIÇA (SLIDE THREE BAR )","cavities":1,"cycle":30}, {"client":"A.S TECHNOLOGY","name":"TAMPA TUBO EXTERNO","cavities":4,"cycle":30},{"client":"A.S TECHNOLOGY","name":"TAMPA FLIP-TOP TUBO","cavities":4,"cycle":32},{"client":"A.S TECHNOLOGY","name":"MOLDE TUBO EXTERNO","cavities":4,"cycle":35},{"client":"ROSEMBERG","name":"BASE CASSETE","cavities":1,"cycle":55},{"client":"ROSEMBERG","name":"TAMPA CASSETE","cavities":1,"cycle":55},{"client":"APTAR","name":"ATUADOR A03L","cavities":56,"cycle":18},{"client":"APTAR","name":"ATUADOR A46L","cavities":32,"cycle":21}];
+            let plannedMachinesData = [];
             let fullDashboardData = { perdas: [], paradas: [] };
             let currentParetoMode = 'refugo';
             let paretoChartInstance, oeeChartInstance, paretoParadaChartInstance, productionTimelineChartInstance;
             let productDataMap = new Map();
             let kpiValues = {};
             let refugoViewMode = 'kg';
-            let planUnsubscribe = null;
-            let currentPlanListenerUnsubscribe = null;
-            let docIdToDelete = null;
-            let collectionToDelete = null;
 
-            // --- SELEtores de DOM ---
+            // --- SELETORES DE DOM ---
             const machineSelect = document.getElementById('maquina');
             const opInput = document.getElementById('op');
             const productionForm = document.getElementById('production-form');
@@ -551,20 +469,13 @@
             const verificacaoTableBody = document.getElementById('verificacao-table-body');
             const refugoCard = document.getElementById('refugo-card');
             const maquinaParadaSelect = document.getElementById('maquina-parada');
-            const planningDateSelector = document.getElementById('planning-date-selector');
-            const planningForm = document.getElementById('planning-form');
-            const planningTableBody = document.getElementById('planning-table-body');
-            const planningClientSelect = document.getElementById('planning-client');
-            const planningProductSelect = document.getElementById('planning-product');
-            const planningMachineSelect = document.getElementById('planning-machine');
 
             // --- LÓGICA PRINCIPAL ---
             const init = () => {
                 lucide.createIcons();
                 setTodayDate();
+                fetchPlannedMachines();
                 setupEventListeners();
-                setupPlanningTab();
-                listenToCurrentProductionPlan();
             };
 
             const setupEventListeners = () => {
@@ -579,11 +490,7 @@
                 refugoCard.addEventListener('click', toggleRefugoView);
                 refreshVerificacaoBtn.addEventListener('click', loadVerificacaoData);
                 verificacaoTableBody.addEventListener('click', handleVerificacaoTableClick);
-                planningForm.addEventListener('submit', handlePlanningFormSubmit);
-                planningDateSelector.addEventListener('change', (e) => listenToPlanningChanges(e.target.value));
-                planningClientSelect.addEventListener('change', onPlanningClientChange);
-                planningProductSelect.addEventListener('change', onPlanningProductChange);
-                planningTableBody.addEventListener('click', handlePlanningTableClick);
+                
                 const confirmModal = document.getElementById('confirm-modal');
                 if(confirmModal) {
                     document.getElementById('confirm-modal-cancel-btn').addEventListener('click', hideConfirmModal);
@@ -594,28 +501,25 @@
             // --- FUNÇÕES DE EVENTOS ---
             const onMachineSelectChange = () => {
                 const selectedMachine = machineSelect.value;
-                const machinePlan = productDataMap.get(selectedMachine);
+                const machinePlan = plannedMachinesData.find(plan => plan.machine === selectedMachine);
                 opInput.value = machinePlan ? machinePlan.product || '' : '';
             };
 
             const handleProductionFormSubmit = async (e) => {
                 e.preventDefault();
-                await handleGenericFormSubmit(productionForm, "perdas", "submit-button", "status-message", "Lançamento salvo com sucesso!");
+                const submitButton = document.getElementById('submit-button');
+                const statusMessage = document.getElementById('status-message');
+                await handleGenericFormSubmit(productionForm, "perdas", submitButton, statusMessage, "Lançamento salvo com sucesso!");
             };
 
             const handleParadaFormSubmit = async (e) => {
                 e.preventDefault();
-                await handleGenericFormSubmit(paradaForm, "paradas", "submit-parada-button", "status-parada-message", "Parada salva com sucesso!");
+                const submitButton = document.getElementById('submit-parada-button');
+                const statusMessage = document.getElementById('status-parada-message');
+                await handleGenericFormSubmit(paradaForm, "paradas", submitButton, statusMessage, "Parada salva com sucesso!");
             };
-            
-            const handlePlanningFormSubmit = async (e) => {
-                e.preventDefault();
-                await handleGenericFormSubmit(planningForm, "planning", "planning-submit-button", "planning-status-message", "Item salvo no plano!");
-            }
 
-            async function handleGenericFormSubmit(formElement, collectionName, buttonId, statusId, successMessage) {
-                 const button = document.getElementById(buttonId);
-                 const status = document.getElementById(statusId);
+            async function handleGenericFormSubmit(formElement, collectionName, button, status, successMessage) {
                  const buttonText = button.querySelector('span') || button;
                  const originalButtonText = buttonText.textContent;
                  button.disabled = true;
@@ -625,6 +529,7 @@
                  const formData = new FormData(formElement);
                  const dataToSave = Object.fromEntries(formData.entries());
 
+                 // Garante que pelo menos um dos campos de perda/produção tenha valor
                  if(collectionName === 'perdas') {
                      const { produzido, refugo, borras, triagem } = dataToSave;
                      if(Number(produzido) === 0 && Number(refugo) === 0 && Number(borras) === 0 && Number(triagem) === 0) {
@@ -636,12 +541,14 @@
                      }
                  }
 
+                 // Converte campos numéricos
                  for (const key in dataToSave) {
                     if (!isNaN(dataToSave[key]) && dataToSave[key] !== '' && typeof dataToSave[key] === 'string') {
                          dataToSave[key] = Number(dataToSave[key]);
                     }
                  }
                  
+                 // Calcula duração da parada
                  if(collectionName === 'paradas') {
                      const { hora_inicio, hora_fim } = dataToSave;
                      if (!hora_inicio || !hora_fim) {
@@ -662,9 +569,7 @@
                      dataToSave.duracao_min = diff / 60000;
                  }
 
-                 if (collectionName !== 'planning') {
-                    dataToSave.timestamp = Timestamp.now();
-                 }
+                 dataToSave.timestamp = Timestamp.now();
                  
                  try {
                      await addDoc(collection(db, collectionName), dataToSave);
@@ -675,17 +580,8 @@
                         opInput.value = '';
                         machineSelect.value = '';
                         document.getElementById('produzido').value = '0';
-                     } else if (formElement === paradaForm) {
+                     } else {
                         maquinaParadaSelect.value = '';
-                     } else if (formElement === planningForm) {
-                        planningClientSelect.value = '';
-                        planningProductSelect.innerHTML = '<option value="">Selecione um cliente</option>';
-                        planningProductSelect.disabled = true;
-                        planningForm.querySelector('#budgeted-cycle').value = '';
-                        planningForm.querySelector('#mold-cavities').value = '';
-                        planningForm.querySelector('#piece-weight').value = '';
-                        planningDateSelector.value = getProductionDateString(new Date());
-                        listenToPlanningChanges(planningDateSelector.value);
                      }
                  } catch (error) {
                      console.error(`Erro ao salvar em ${collectionName}:`, error);
@@ -707,16 +603,8 @@
                 tabButtons.forEach(btn => btn.classList.remove('active'));
                 e.currentTarget.classList.add('active');
                 tabPanes.forEach(pane => {
-                    const isTarget = pane.id === `${tabId}-tab`;
-                    pane.style.display = isTarget ? 'block' : 'none';
-                    if (isTarget) {
-                        pane.classList.remove('active');
-                        setTimeout(() => pane.classList.add('active'), 10);
-                    } else {
-                         pane.classList.remove('active');
-                    }
+                    pane.style.display = pane.id === `${tabId}-tab` ? 'block' : 'none';
                 });
-                
                 if (tabId === 'dashboard' && fullDashboardData.perdas.length === 0 && fullDashboardData.paradas.length === 0) loadDashboardData();
                 if (tabId === 'verificacao') loadVerificacaoData();
             };
@@ -739,165 +627,30 @@
                     showConfirmModal(deleteBtn.dataset.id, deleteBtn.dataset.collection);
                 }
             };
-            
-            // --- Funções da Aba de Planejamento ---
-            const setupPlanningTab = () => {
-                planningDateSelector.value = getProductionDateString(new Date());
-                
-                for (let i = 1; i <= 32; i++) {
-                    const option = document.createElement('option');
-                    const machineName = `H-${String(i).padStart(2, '0')}`;
-                    option.value = machineName;
-                    option.textContent = machineName;
-                    planningMachineSelect.appendChild(option);
-                }
-
-                const clients = [...new Set(productDatabase.map(p => p.client))].sort();
-                planningClientSelect.innerHTML = '<option value="">Selecione o Cliente</option>';
-                clients.forEach(client => {
-                    const option = document.createElement('option');
-                    option.value = client;
-                    option.textContent = client;
-                    planningClientSelect.appendChild(option);
-                });
-
-                listenToPlanningChanges(planningDateSelector.value);
-            };
-
-            const onPlanningClientChange = (e) => {
-                const selectedClient = e.target.value;
-                const products = productDatabase.filter(p => p.client === selectedClient).sort((a,b) => a.name.localeCompare(b.name));
-                planningProductSelect.innerHTML = '<option value="">Selecione o Produto</option>';
-                products.forEach(product => {
-                    const option = document.createElement('option');
-                    option.value = product.name;
-                    option.textContent = product.name;
-                    planningProductSelect.appendChild(option);
-                });
-                planningProductSelect.disabled = !selectedClient;
-            };
-
-            const onPlanningProductChange = (e) => {
-                const selectedClient = planningClientSelect.value;
-                const selectedProduct = e.target.value;
-                const product = productDatabase.find(p => p.client === selectedClient && p.name === selectedProduct);
-                if (product) {
-                    planningForm.querySelector('#budgeted-cycle').value = product.cycle;
-                    planningForm.querySelector('#mold-cavities').value = product.cavities;
-                }
-            };
-
-            const listenToPlanningChanges = (date) => {
-                document.getElementById('planning-loading').style.display = 'block';
-                document.getElementById('planning-no-data').style.display = 'none';
-                planningTableBody.innerHTML = '';
-                
-                if (planUnsubscribe) planUnsubscribe();
-
-                const q = query(collection(db, "planning"), where("date", "==", date));
-                planUnsubscribe = onSnapshot(q, (querySnapshot) => {
-                    const planItems = [];
-                    querySnapshot.forEach((doc) => {
-                        planItems.push({ id: doc.id, ...doc.data() });
-                    });
-                    renderPlanningTable(planItems.sort((a, b) => parseInt(a.machine.split('-')[1]) - parseInt(b.machine.split('-')[1])));
-                    document.getElementById('planning-loading').style.display = 'none';
-                    document.getElementById('planning-no-data').style.display = planItems.length > 0 ? 'none' : 'block';
-                }, (error) => {
-                    console.error("Erro ao escutar planning:", error);
-                    document.getElementById('planning-loading').style.display = 'none';
-                    alert("Erro ao carregar planejamento.");
-                });
-            };
-            
-            const renderPlanningTable = (items) => {
-                planningTableBody.innerHTML = '';
-                if (!items || items.length === 0) return;
-                
-                items.forEach(item => {
-                    const row = document.createElement('tr');
-                    row.className = 'hover:bg-slate-50';
-                    row.innerHTML = `
-                        <td class="px-4 py-3 text-sm font-semibold text-slate-800">${item.machine}</td>
-                        <td class="px-4 py-3 text-sm text-slate-700">${item.product}</td>
-                        <td class="px-4 py-3 text-sm text-slate-700">${item.budgeted_cycle}s</td>
-                        <td class="px-4 py-3 text-sm text-slate-700">${item.mold_cavities}</td>
-                        <td class="px-4 py-3 text-center">
-                            <button data-id="${item.id}" data-collection="planning" class="delete-btn text-red-500 hover:text-red-700 p-1 rounded-md hover:bg-red-100">
-                                <i data-lucide="trash-2" class="w-4 h-4"></i>
-                            </button>
-                        </td>
-                    `;
-                    planningTableBody.appendChild(row);
-                });
-                lucide.createIcons();
-            };
-
-            const handlePlanningTableClick = (e) => {
-                const deleteBtn = e.target.closest('.delete-btn');
-                if (deleteBtn) {
-                    showConfirmModal(deleteBtn.dataset.id, deleteBtn.dataset.collection);
-                }
-            };
 
             // --- FUNÇÕES DE DADOS E API ---
-            function setupLossForms(planItems) {
-                const lossMachineSelects = [machineSelect, maquinaParadaSelect];
-                productDataMap.clear();
-
-                if (!planItems || planItems.length === 0) {
-                    lossMachineSelects.forEach(sel => sel.innerHTML = `<option value="">Nenhuma máquina no plano de hoje</option>`);
-                    opInput.value = '';
-                    return;
+            async function fetchPlannedMachines() {
+                [machineSelect, maquinaParadaSelect].forEach(sel => {
+                    sel.innerHTML = `<option value="">A carregar máquinas...</option>`;
+                    sel.disabled = true;
+                });
+                const productionDay = getProductionDateString();
+                const url = `${SUPABASE_URL}/rest/v1/production_plan?select=machine,product,piece_weight,budgeted_cycle,mold_cavities&date=eq.${productionDay}`;
+                try {
+                    const response = await fetch(url, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
+                    if (!response.ok) throw new Error(`Erro na rede: ${response.statusText}`);
+                    const data = await response.json();
+                    plannedMachinesData = data;
+                    populateMachineSelects(plannedMachinesData);
+                } catch (error) {
+                    console.error('Erro ao buscar máquinas planeadas:', error);
+                    [machineSelect, maquinaParadaSelect].forEach(sel => sel.innerHTML = `<option value="">Erro ao carregar</option>`);
+                    alert(`Não foi possível carregar o planeamento: ${error.message}`);
+                } finally {
+                    [machineSelect, maquinaParadaSelect].forEach(sel => sel.disabled = false);
                 }
-
-                const uniqueMachines = [...new Set(planItems.map(item => item.machine))].sort((a, b) => parseInt(a.split('-')[1]) - parseInt(b.split('-')[1]));
-                
-                lossMachineSelects.forEach(sel => {
-                    const currentVal = sel.value;
-                    sel.innerHTML = '<option value="">Selecione uma Máquina</option>';
-                    uniqueMachines.forEach(machineName => {
-                       const option = document.createElement('option');
-                       option.value = machineName;
-                       option.textContent = machineName;
-                       sel.appendChild(option);
-                    });
-                    if (uniqueMachines.includes(currentVal)) {
-                        sel.value = currentVal;
-                    }
-                    sel.disabled = false;
-                });
-                
-                planItems.forEach(item => {
-                    productDataMap.set(item.machine, {
-                        product: item.product,
-                        weight: item.piece_weight,
-                        cycle: item.budgeted_cycle,
-                        cavities: item.mold_cavities
-                    });
-                });
-                
-                onMachineSelectChange();
             }
 
-            function listenToCurrentProductionPlan() {
-                if (currentPlanListenerUnsubscribe) currentPlanListenerUnsubscribe();
-                
-                const productionDay = getProductionDateString(new Date());
-                const q = query(collection(db, "planning"), where("date", "==", productionDay));
-
-                currentPlanListenerUnsubscribe = onSnapshot(q, (querySnapshot) => {
-                    const planItems = [];
-                    querySnapshot.forEach((doc) => {
-                        planItems.push(doc.data());
-                    });
-                    setupLossForms(planItems);
-                }, (error) => {
-                    console.error("Erro ao escutar plano do dia:", error);
-                    alert("Erro ao carregar o plano de produção para os formulários.");
-                });
-            }
-            
             async function loadDashboardData() {
                 const dashboardContent = document.getElementById('dashboard-content');
                 const dashboardLoading = document.getElementById('dashboard-loading');
@@ -918,17 +671,17 @@
                     
                     const perdasQuery = query(collection(db, "perdas"), where("timestamp", ">=", Timestamp.fromDate(startDate)), where("timestamp", "<", Timestamp.fromDate(endDate)));
                     const paradasQuery = query(collection(db, "paradas"), where("timestamp", ">=", Timestamp.fromDate(startDate)), where("timestamp", "<", Timestamp.fromDate(endDate)));
-                    const planningQuery = query(collection(db, "planning"), where("date", ">=", startDateStr), where("date", "<=", endDateStr));
 
-                    const [perdasSnapshot, paradasSnapshot, planningSnapshot] = await Promise.all([getDocs(perdasQuery), getDocs(paradasQuery), getDocs(planningQuery)]);
+                    const [perdasSnapshot, paradasSnapshot] = await Promise.all([getDocs(perdasQuery), getDocs(paradasQuery)]);
 
+                    const url = `${SUPABASE_URL}/rest/v1/production_plan?select=product,piece_weight,budgeted_cycle,mold_cavities&date=gte.${startDateStr}&date=lte.${endDateStr}`;
+                    const response = await fetch(url, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
+                    if (!response.ok) throw new Error(`Erro na rede ao buscar dados do plano: ${response.statusText}`);
+                    const planData = await response.json();
                     productDataMap.clear();
-                    planningSnapshot.forEach(doc => {
-                        const item = doc.data();
-                         if (item.product) { 
-                            const key = `${item.date}-${item.machine}`;
-                            productDataMap.set(key, {
-                                product: item.product,
+                    planData.forEach(item => { 
+                        if (item.product) { 
+                            productDataMap.set(item.product, {
                                 weight: item.piece_weight,
                                 cycle: item.budgeted_cycle,
                                 cavities: item.mold_cavities
@@ -936,8 +689,8 @@
                         }
                     });
                     
-                    fullDashboardData.perdas = perdasSnapshot.docs.map(doc => ({...doc.data(), id: doc.id}));
-                    fullDashboardData.paradas = paradasSnapshot.docs.map(doc => ({...doc.data(), id: doc.id}));
+                    fullDashboardData.perdas = perdasSnapshot.docs.map(doc => doc.data());
+                    fullDashboardData.paradas = paradasSnapshot.docs.map(doc => doc.data());
 
                     populateMachineFilter(fullDashboardData.perdas);
                     processAndRenderDashboard(fullDashboardData);
@@ -950,7 +703,7 @@
                     dashboardLoading.style.display = 'none';
                 }
             }
-
+            
             async function loadVerificacaoData() {
                 const dateStr = verificacaoDateSelector.value;
                 if (!dateStr) return;
@@ -987,13 +740,38 @@
                 }
             }
 
-            function getPlanForRecord(record) {
-                if (!record.timestamp) return null;
-                const recordDate = getProductionDateString(record.timestamp.toDate());
-                const key = `${recordDate}-${record.maquina}`;
-                return productDataMap.get(key);
+            // --- FUNÇÕES DE RENDERIZAÇÃO E UI ---
+            function populateMachineSelects(machines) {
+                const machineSelectors = [machineSelect, maquinaParadaSelect];
+                if (!machines || machines.length === 0) {
+                    machineSelectors.forEach(sel => sel.innerHTML = '<option value="">Nenhuma máquina no plano de hoje</option>'); 
+                    return;
+                }
+                const uniqueMachines = [...new Set(machines.map(item => item.machine))].sort((a, b) => parseInt(a.split('-')[1]) - parseInt(b.split('-')[1]));
+                machineSelectors.forEach(sel => {
+                    sel.innerHTML = '<option value="">Selecione uma Máquina</option>';
+                    uniqueMachines.forEach(machine => {
+                        const option = document.createElement('option');
+                        option.value = machine;
+                        option.textContent = machine;
+                        sel.appendChild(option);
+                    });
+                });
             }
-            
+
+            function populateMachineFilter(data) {
+                const currentVal = machineFilter.value;
+                const machines = [...new Set(data.map(item => item.maquina))].sort();
+                machineFilter.innerHTML = '<option value="total">Visão Geral (Total)</option>';
+                machines.forEach(machine => {
+                    const option = document.createElement('option');
+                    option.value = machine;
+                    option.textContent = machine;
+                    machineFilter.appendChild(option);
+                });
+                if (machines.includes(currentVal)) { machineFilter.value = currentVal; }
+            }
+                
             function processAndRenderDashboard({ perdas, paradas }) {
                 const selectedMachine = machineFilter.value;
                 const filteredPerdas = selectedMachine === 'total' ? perdas : perdas.filter(row => row.maquina === selectedMachine);
@@ -1017,7 +795,7 @@
                 const totalBorras = filteredPerdas.reduce((sum, row) => sum + (row.borras || 0), 0);
                 const totalParadaMin = filteredParadas.reduce((sum, row) => sum + (row.duracao_min || 0), 0);
                 const totalRefugoPcs = filteredPerdas.reduce((sum, row) => {
-                    const plan = getPlanForRecord(row);
+                    const plan = productDataMap.get(row.produto);
                     if (plan && plan.weight > 0 && row.refugo > 0) {
                         return sum + ((row.refugo * 1000) / plan.weight);
                     }
@@ -1068,13 +846,7 @@
 
             function calculateAndDisplayOEE(perdasData, paradasData) {
                 const TEMPO_TURNO_MIN = 450;
-                const perdasPorTurno = perdasData.reduce((acc, p) => {
-                    const key = `${p.maquina}-${p.turno}`;
-                    if(!acc[key]) acc[key] = [];
-                    acc[key].push(p);
-                    return acc;
-                }, {});
-                const totalTurnos = Object.keys(perdasPorTurno).length;
+                const totalTurnos = new Set(perdasData.map(p => `${p.maquina}-${p.turno}`)).size;
                 
                 if(totalTurnos === 0) {
                     updateOeeKpis({ availability: 0, performance: 0, quality: 0, oee: 0 });
@@ -1090,28 +862,25 @@
 
                 const totalProduzido = perdasData.reduce((sum, row) => sum + (row.produzido || 0), 0);
                 const totalRefugoPcs = perdasData.reduce((sum, row) => {
-                    const plan = getPlanForRecord(row);
+                    const plan = productDataMap.get(row.produto);
                     if (plan && plan.weight > 0 && row.refugo > 0) {
                         return sum + ((row.refugo * 1000) / plan.weight);
                     }
                     return sum;
                 }, 0);
 
-                let totalProduzidoIdeal = 0;
-                for(const key in perdasPorTurno) {
-                    const [maquina, turno] = key.split('-');
-                    const record = perdasPorTurno[key][0]; // get a sample record to find the plan
-                    const plan = getPlanForRecord(record);
-                    
-                    const paradasDoTurno = paradasData.filter(p => p.maquina === maquina && p.turno == turno);
+                const totalProduzidoIdeal = perdasData.reduce((sum, row) => {
+                    const plan = productDataMap.get(row.produto);
+                    const paradasDoTurno = paradasData.filter(p => p.maquina === row.maquina && p.turno === row.turno);
                     const paradaTurnoMin = paradasDoTurno.reduce((s, p) => s + p.duracao_min, 0);
                     const tempoProduzindoTurno = TEMPO_TURNO_MIN - paradaTurnoMin;
                     
                     if(plan && plan.cycle > 0 && tempoProduzindoTurno > 0) {
                         const pecasPorMinutoIdeal = (plan.cavities / plan.cycle) * 60;
-                        totalProduzidoIdeal += (pecasPorMinutoIdeal * tempoProduzindoTurno);
+                        return sum + (pecasPorMinutoIdeal * tempoProduzindoTurno);
                     }
-                }
+                    return sum;
+                }, 0);
                 
                 const performance = totalProduzidoIdeal > 0 ? (totalProduzido / totalProduzidoIdeal) : 0;
                 
@@ -1120,13 +889,15 @@
 
                 const oee = availability * performance * quality;
 
-                updateOeeKpis({
+                const results = {
                     availability: availability * 100,
                     performance: performance * 100,
                     quality: quality * 100,
                     oee: oee * 100
-                });
-                renderOeeChart({ availability, performance, quality, oee });
+                };
+
+                updateOeeKpis(results);
+                renderOeeChart(results);
             }
 
             function updateKpiCards() {
@@ -1171,7 +942,7 @@
             function renderOeeChart(data) {
                 const ctx = document.getElementById('oeeChart').getContext('2d');
                 if (oeeChartInstance) oeeChartInstance.destroy();
-                const chartData = [ data.availability*100, data.performance*100, data.quality*100, data.oee*100 ];
+                const chartData = [ data.availability, data.performance, data.quality, data.oee ];
                 oeeChartInstance = new Chart(ctx, {
                     type: 'bar',
                     data: {
@@ -1193,6 +964,7 @@
             }
 
             function renderProductionTimelineChart(data, selectedMachine) {
+                const container = document.getElementById('production-timeline-container');
                 const canvas = document.getElementById('productionTimelineChart');
                 const message = document.getElementById('timeline-chart-message');
 
@@ -1210,7 +982,7 @@
                 const hourlyData = new Array(24).fill(0);
 
                 data.forEach(record => {
-                    if (record.produzido > 0 && record.timestamp) {
+                    if (record.produzido > 0) {
                         const hour = record.timestamp.toDate().getHours();
                         const index = hour >= 7 ? hour - 7 : hour + 17;
                         if (index >= 0 && index < 24) {
@@ -1274,14 +1046,17 @@
                 verificacaoTableBody.appendChild(row);
                 lucide.createIcons();
             }
-            
+
+            let docIdToDelete = null;
+            let collectionToDelete = null;
+            const confirmModal = document.getElementById('confirm-modal');
             const showConfirmModal = (id, collection) => {
                 docIdToDelete = id;
                 collectionToDelete = collection;
-                document.getElementById('confirm-modal').classList.remove('hidden');
+                confirmModal.classList.remove('hidden');
             };
             const hideConfirmModal = () => {
-                document.getElementById('confirm-modal').classList.add('hidden');
+                confirmModal.classList.add('hidden');
                 docIdToDelete = null;
                 collectionToDelete = null;
             };
@@ -1301,7 +1076,6 @@
             
             const setTodayDate = () => {
                 const todayString = getProductionDateString();
-                planningDateSelector.value = todayString;
                 startDateSelector.value = todayString;
                 endDateSelector.value = todayString;
                 verificacaoDateSelector.value = todayString;
@@ -1312,4 +1086,5 @@
     </script>
 </body>
 </html>
+
 
