@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hokkaido Synchro - OEE & Controle de Perdas v3.3</title>
+    <title>Hokkaido Synchro - Controle de Perdas v2.11</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -47,17 +47,15 @@
     <div class="container mx-auto p-3 sm:p-4 md:p-6 lg:p-8">
         
         <header class="text-center mb-8 w-full">
+            <img src="https://i.postimg.cc/d1qY1zN0/hkk.png" alt="Logo Hokkaido Plastics" class="mx-auto h-20 w-auto mb-4">
             <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-blue-500">Hokkaido Synchro</h1>
-            <p class="text-lg text-slate-600 font-medium mt-1">OEE & Controle de Perdas</p>
+            <p class="text-lg text-slate-600 font-medium mt-1">Controle de Perdas</p>
         </header>
 
         <div class="mb-6 border-b border-slate-300">
             <nav class="flex space-x-6 overflow-x-auto">
                 <button class="tab-btn py-3 px-1 text-slate-600 hover:text-cyan-600 border-b-2 border-transparent transition-all duration-300 active whitespace-nowrap" data-tab="lancamento">
-                    <i data-lucide="package-plus" class="w-4 h-4 inline-block mr-2"></i>Produção & Perdas
-                </button>
-                <button class="tab-btn py-3 px-1 text-slate-600 hover:text-cyan-600 border-b-2 border-transparent transition-all duration-300 whitespace-nowrap" data-tab="parada">
-                    <i data-lucide="timer-off" class="w-4 h-4 inline-block mr-2"></i>Lançamento de Parada
+                    <i data-lucide="edit-3" class="w-4 h-4 inline-block mr-2"></i>Lançamento
                 </button>
                 <button class="tab-btn py-3 px-1 text-slate-600 hover:text-cyan-600 border-b-2 border-transparent transition-all duration-300 whitespace-nowrap" data-tab="dashboard">
                     <i data-lucide="layout-dashboard" class="w-4 h-4 inline-block mr-2"></i>Dashboard
@@ -71,7 +69,7 @@
         <div id="tab-content">
             <div id="lancamento-tab" class="tab-pane active fade-in">
                 <main class="w-full max-w-2xl mx-auto bg-white p-6 md:p-8 rounded-lg shadow-lg border-t-4 border-cyan-500">
-                    <h2 class="text-2xl font-bold mb-4 flex items-center gap-2 text-slate-800 border-b-2 border-slate-100 pb-3"><i data-lucide="package-plus" class="text-cyan-600"></i>Lançar Produção e Perdas do Turno</h2>
+                    <h2 class="text-2xl font-bold mb-4 flex items-center gap-2 text-slate-800 border-b-2 border-slate-100 pb-3"><i data-lucide="edit-3" class="text-cyan-600"></i>Lançamento de Turno</h2>
                     <form id="production-form" class="space-y-5 pt-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
                             <div>
@@ -97,8 +95,8 @@
                                 <input type="text" id="op" name="produto" required placeholder="Preenchido automaticamente" class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 transition bg-slate-50" readonly>
                             </div>
                             <div>
-                                <label for="produzido" class="block text-sm font-medium text-slate-700">Produção (peças)</label>
-                                <input type="number" id="produzido" name="produzido" min="0" value="0" class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
+                                <label for="produzido" class="block text-sm font-medium text-slate-700">Produção</label>
+                                <input type="number" id="produzido" name="produzido" min="0" required class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
                             </div>
                              <div>
                                 <label for="triagem" class="block text-sm font-medium text-slate-700">Peças para Triagem</label>
@@ -116,36 +114,7 @@
                                 <label for="perdas" class="block text-sm font-medium text-slate-700">Perdas (Motivo do Refugo)</label>
                                 <select id="perdas" name="perdas" required class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
                                     <option value="N/A">Não se aplica / Sem refugo</option>
-                                    <optgroup label="MÁQUINA">
-                                        <option value="01 - LIMPEZA">01 - LIMPEZA</option>
-                                        <option value="02 - INÍCIO DE PRODUÇÃO">02 - INÍCIO DE PRODUÇÃO</option>
-                                        <option value="03 - QUEDA DE ENERGIA">03 - QUEDA DE ENERGIA</option>
-                                        <option value="04 - PARADA EMERGENCIAL">04 - PARADA EMERGENCIAL</option>
-                                        <option value="05 - VAZAMENTO DE ÓLEO">05 - VAZAMENTO DE ÓLEO</option>
-                                        <option value="06 - AUSÊNCIA DE PERIFÉRICOS">06 - AUSÊNCIA DE PERIFÉRICOS</option>
-                                        <option value="07 - FALTA DE MATÉRIA PRIMA">07 - FALTA DE MATÉRIA PRIMA</option>
-                                        <option value="08 - SUJIDADE (GRAXA, ÁGUA, ETC)">08 - SUJIDADE (GRAXA, ÁGUA, ETC)</option>
-                                    </optgroup>
-                                    <optgroup label="MOLDE">
-                                        <option value="11 - CORRETIVA">11 - CORRETIVA</option>
-                                        <option value="12 - LIMPEZA DE TIPS">12 - LIMPEZA DE TIPS</option>
-                                        <option value="13 - TROCA DE LÂMINA">13 - TROCA DE LÂMINA</option>
-                                        <option value="14 - ABERTURA DE CAVIDADES">14 - ABERTURA DE CAVIDADES</option>
-                                        <option value="15 - MARCA D'ÁGUA">15 - MARCA D'ÁGUA</option>
-                                        <option value="16 - MARCA DE EXTRATOR">16 - MARCA DE EXTRATOR</option>
-                                        <option value="17 - TRY-OUT">17 - TRY-OUT</option>
-                                    </optgroup>
-                                    <optgroup label="PROCESSO">
-                                        <option value="21 - FALHA DE INJEÇÃO">21 - FALHA DE INJEÇÃO</option>
-                                        <option value="22 - CONTAMINAÇÃO">22 - CONTAMINAÇÃO</option>
-                                        <option value="23 - REBARBA">23 - REBARBA</option>
-                                        <option value="24 - TROCA DE COR">24 - TROCA DE COR</option>
-                                        <option value="25 - FORA DE COR">25 - FORA DE COR</option>
-                                        <option value="26 - PONTO DE INJEÇÃO ALTO">26 - PONTO DE INJEÇÃO ALTO</option>
-                                        <option value="27 - FALTA DE OPERADOR">27 - FALTA DE OPERADOR</option>
-                                        <option value="28 - FORA DO DIMENSIONAL">28 - FORA DO DIMENSIONAL</option>
-                                        <option value="29 - AJUSTE DE PROCESSO">29 - AJUSTE DE PROCESSO</option>
-                                    </optgroup>
+                                    <option value="BOLHA">BOLHA</option><option value="CHUPAGEM">CHUPAGEM</option><option value="CONTAMINAÇÃO">CONTAMINAÇÃO</option><option value="DEGRADAÇÃO">DEGRADAÇÃO</option><option value="DEFORMAÇÃO">DEFORMAÇÃO</option><option value="EMPENAMENTO">EMPENAMENTO</option><option value="FALHA">FALHA</option><option value="FIAPO">FIAPO</option><option value="FORA DE COR">FORA DE COR</option><option value="GALHO PRESO">GALHO PRESO</option><option value="INÍCIO/ REÍNICIO">INÍCIO/ REÍNICIO</option><option value="JUNÇÃO">JUNÇÃO</option><option value="MANCHAS">MANCHAS</option><option value="MARCA D'ÁGUA">MARCA D'ÁGUA</option><option value="MARCA EXTRATOR">MARCA EXTRATOR</option><option value="MEDIDA FORA DO ESPECIFICADO">MEDIDA FORA DO ESPECIFICADO</option><option value="MOÍDO">MOÍDO</option><option value="PEÇAS PERDIDAS">PEÇAS PERDIDAS</option><option value="QUEIMA">QUEIMA</option><option value="REBARBA">REBARBA</option><option value="RISCOS">RISCOS</option><option value="SUJIDADE">SUJIDADE</option>
                                 </select>
                             </div>
                         </div>
@@ -156,60 +125,6 @@
                                 <span>Enviar Lançamento</span>
                             </button>
                             <div id="status-message" class="text-sm font-semibold h-5 text-center"></div>
-                        </div>
-                    </form>
-                </main>
-            </div>
-            
-            <div id="parada-tab" class="tab-pane" style="display: none;">
-                <main class="w-full max-w-2xl mx-auto bg-white p-6 md:p-8 rounded-lg shadow-lg border-t-4 border-amber-500">
-                    <h2 class="text-2xl font-bold mb-4 flex items-center gap-2 text-slate-800 border-b-2 border-slate-100 pb-3"><i data-lucide="timer-off" class="text-amber-500"></i>Lançar Parada de Máquina</h2>
-                    <form id="parada-form" class="space-y-5 pt-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
-                            <div>
-                                <label for="maquina-parada" class="block text-sm font-medium text-slate-700">Máquina</label>
-                                <select id="maquina-parada" name="maquina" required class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500 transition" disabled>
-                                    <option value="">A carregar...</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="turno-parada" class="block text-sm font-medium text-slate-700">Turno</label>
-                                <select id="turno-parada" name="turno" required class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500 transition">
-                                    <option value="1">1º Turno</option>
-                                    <option value="2">2º Turno</option>
-                                    <option value="3">3º Turno</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="hora-inicio" class="block text-sm font-medium text-slate-700">Hora Início</label>
-                                <input type="time" id="hora-inicio" name="hora_inicio" required class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500 transition">
-                            </div>
-                            <div>
-                                <label for="hora-fim" class="block text-sm font-medium text-slate-700">Hora Fim</label>
-                                <input type="time" id="hora-fim" name="hora_fim" required class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500 transition">
-                            </div>
-                            <div class="md:col-span-2">
-                                <label for="motivo-parada" class="block text-sm font-medium text-slate-700">Motivo da Parada</label>
-                                <select id="motivo-parada" name="motivo" required class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500 transition">
-                                    <option value="TROCA DE MOLDE">TROCA DE MOLDE</option>
-                                    <option value="MANUTENÇÃO CORRETIVA">MANUTENÇÃO CORRETIVA</option>
-                                    <option value="MANUTENÇÃO PREVENTIVA">MANUTENÇÃO PREVENTIVA</option>
-                                    <option value="FALTA DE MATERIAL">FALTA DE MATERIAL</option>
-                                    <option value="SETUP DE MÁQUINA">SETUP DE MÁQUINA</option>
-                                    <option value="PROBLEMA ELÉTRICO">PROBLEMA ELÉTRICO</option>
-                                    <option value="PROBLEMA HIDRÁULICO">PROBLEMA HIDRÁULICO</option>
-                                    <option value="REFEIÇÃO/INTERVALO">REFEIÇÃO/INTERVALO</option>
-                                    <option value="OUTROS">OUTROS</option>
-                                </select>
-                            </div>
-                        </div>
-                        <hr class="border-slate-200 my-4">
-                        <div class="flex flex-col items-center gap-4">
-                            <button type="submit" id="submit-parada-button" class="w-full md:w-auto bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-8 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:bg-slate-400 disabled:cursor-not-allowed shadow-sm hover:shadow-md">
-                                <i data-lucide="save" class="w-5 h-5"></i>
-                                <span>Salvar Parada</span>
-                            </button>
-                            <div id="status-parada-message" class="text-sm font-semibold h-5 text-center"></div>
                         </div>
                     </form>
                 </main>
@@ -239,40 +154,6 @@
                     </button>
                 </div>
                 <div id="dashboard-content" class="space-y-6" style="display: none;">
-                    <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-slate-700">
-                        <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-800"><i data-lucide="gauge-circle" class="text-slate-600"></i>Indicadores de Eficiência Global (OEE)</h2>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                           <div class="bg-white p-5 rounded-lg shadow-lg flex items-center gap-4 border-l-4 border-teal-500">
-                                <div class="p-3 bg-teal-100 rounded-full"><i data-lucide="timer" class="w-7 h-7 text-teal-600"></i></div>
-                                <div>
-                                    <p class="text-sm text-slate-500">Disponibilidade</p>
-                                    <p id="kpi-disponibilidade" class="text-2xl font-bold">...</p>
-                                </div>
-                            </div>
-                             <div class="bg-white p-5 rounded-lg shadow-lg flex items-center gap-4 border-l-4 border-sky-500">
-                                <div class="p-3 bg-sky-100 rounded-full"><i data-lucide="gauge" class="w-7 h-7 text-sky-600"></i></div>
-                                <div>
-                                    <p class="text-sm text-slate-500">Performance</p>
-                                    <p id="kpi-performance" class="text-2xl font-bold">...</p>
-                                </div>
-                            </div>
-                             <div class="bg-white p-5 rounded-lg shadow-lg flex items-center gap-4 border-l-4 border-amber-500">
-                                <div class="p-3 bg-amber-100 rounded-full"><i data-lucide="award" class="w-7 h-7 text-amber-600"></i></div>
-                                <div>
-                                    <p class="text-sm text-slate-500">Qualidade</p>
-                                    <p id="kpi-qualidade" class="text-2xl font-bold">...</p>
-                                </div>
-                            </div>
-                             <div class="bg-gradient-to-br from-cyan-500 to-blue-600 text-white p-5 rounded-lg shadow-xl flex items-center gap-4 border-l-4 border-blue-300">
-                                <div class="p-3 bg-white/20 rounded-full"><i data-lucide="star" class="w-7 h-7"></i></div>
-                                <div>
-                                    <p class="text-sm text-blue-100">OEE Geral</p>
-                                    <p id="kpi-oee" class="text-2xl font-bold">...</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div class="bg-white p-5 rounded-lg shadow-lg flex items-center gap-4">
                             <div class="p-3 bg-blue-100 rounded-full"><i data-lucide="package" class="w-7 h-7 text-blue-600"></i></div>
@@ -292,10 +173,10 @@
                             <i data-lucide="repeat" class="w-5 h-5 text-slate-400"></i>
                         </div>
                         <div class="bg-white p-5 rounded-lg shadow-lg flex items-center gap-4">
-                            <div class="p-3 bg-orange-100 rounded-full"><i data-lucide="clock" class="w-7 h-7 text-orange-600"></i></div>
+                            <div class="p-3 bg-purple-100 rounded-full"><i data-lucide="clipboard-check" class="w-7 h-7 text-purple-600"></i></div>
                             <div>
-                                <p class="text-sm text-slate-500">Total de Parada</p>
-                                <p id="kpi-parada" class="text-2xl font-bold">...</p>
+                                <p class="text-sm text-slate-500">Total para Triagem</p>
+                                <p id="kpi-triagem" class="text-2xl font-bold">...</p>
                             </div>
                         </div>
                         <div class="bg-white p-5 rounded-lg shadow-lg flex items-center gap-4">
@@ -306,36 +187,20 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- GRÁFICO DE LINHA: ALTURA AJUSTADA -->
-                    <div id="production-timeline-container" class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-indigo-500 relative">
-                        <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-800 border-b-2 border-slate-100 pb-3"><i data-lucide="line-chart" class="text-indigo-500"></i>Produção por Hora</h2>
-                        <div class="relative h-72">
-                             <canvas id="productionTimelineChart"></canvas>
-                        </div>
-                        <div id="timeline-chart-message" class="hidden text-center py-10 text-slate-500">
-                             <p>Selecione uma única máquina no filtro para visualizar a linha do tempo.</p>
-                        </div>
-                    </div>
-                    
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-blue-500 relative">
-                            <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-800 border-b-2 border-slate-100 pb-3"><i data-lucide="pie-chart" class="text-blue-500"></i>Análise de OEE</h2>
-                             <canvas id="oeeChart"></canvas>
-                        </div>
-                        <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-orange-500 relative">
-                            <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-800 border-b-2 border-slate-100 pb-3"><i data-lucide="bar-chart-3" class="text-orange-500"></i>Principais Motivos de Parada</h2>
-                            <canvas id="paretoParadaChart"></canvas>
-                        </div>
-                        <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-red-500 relative lg:col-span-2">
+                        <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-red-500 relative">
                             <div class="flex justify-between items-start">
-                                <h2 id="pareto-title" class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-800 border-b-2 border-slate-100 pb-3"><i data-lucide="bar-chart-3" class="text-red-500"></i>Principais Motivos de Refugo</h2>
+                                <h2 id="pareto-title" class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-800 border-b-2 border-slate-100 pb-3"><i data-lucide="bar-chart-3" class="text-red-500"></i>Principais Motivos de Perdas</h2>
                                 <div class="flex items-center rounded-md bg-slate-100 p-1 text-sm">
                                     <button id="pareto-refugo-btn" class="pareto-toggle px-3 py-1 rounded-md transition-colors active">Refugo</button>
                                     <button id="pareto-borras-btn" class="pareto-toggle px-3 py-1 rounded-md transition-colors">Borras</button>
                                 </div>
                             </div>
                             <canvas id="paretoChart"></canvas>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-blue-500 relative">
+                            <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-800 border-b-2 border-slate-100 pb-3"><i data-lucide="bar-chart-horizontal" class="text-blue-500"></i>Análise de Perdas por Turno (kg)</h2>
+                             <canvas id="turnoChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -351,28 +216,30 @@
             </div>
 
             <div id="verificacao-tab" class="tab-pane" style="display: none;">
-                 <div class="mb-6 flex flex-col md:flex-row items-center justify-between gap-4 bg-white p-4 rounded-lg shadow-md">
-                      <h2 class="text-xl font-bold text-slate-800 whitespace-nowrap">Verificar e Excluir Lançamentos</h2>
-                      <div class="w-full flex flex-col md:flex-row items-center gap-4">
-                          <div class="flex-1 flex items-center gap-2">
-                              <label for="verificacao-date-selector" class="font-semibold text-slate-700 text-sm md:text-base whitespace-nowrap">Data:</label>
-                              <input type="date" id="verificacao-date-selector" class="w-full border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 transition">
-                          </div>
-                          <button id="refresh-verificacao-btn" class="w-full md:w-auto bg-cyan-600 hover:bg-cyan-700 text-white font-bold p-2 px-6 rounded-lg transition-colors flex items-center justify-center gap-2" title="Buscar lançamentos">
-                              <i data-lucide="search" class="w-5 h-5"></i>
-                              <span>Buscar</span>
-                          </button>
-                      </div>
+                <div class="mb-6 flex flex-col md:flex-row items-center justify-between gap-4 bg-white p-4 rounded-lg shadow-md">
+                     <h2 class="text-xl font-bold text-slate-800 whitespace-nowrap">Verificar e Excluir Lançamentos</h2>
+                     <div class="w-full flex flex-col md:flex-row items-center gap-4">
+                        <div class="flex-1 flex items-center gap-2">
+                             <label for="verificacao-date-selector" class="font-semibold text-slate-700 text-sm md:text-base whitespace-nowrap">Data:</label>
+                             <input type="date" id="verificacao-date-selector" class="w-full border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 transition">
+                        </div>
+                         <button id="refresh-verificacao-btn" class="w-full md:w-auto bg-cyan-600 hover:bg-cyan-700 text-white font-bold p-2 px-6 rounded-lg transition-colors flex items-center justify-center gap-2" title="Buscar lançamentos">
+                            <i data-lucide="search" class="w-5 h-5"></i>
+                            <span>Buscar</span>
+                        </button>
+                     </div>
                 </div>
                 <div id="verificacao-content" class="bg-white p-6 rounded-lg shadow-lg">
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-slate-200">
                             <thead class="bg-slate-50">
                                 <tr>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Tipo</th>
                                     <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Data/Hora</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Operador</th>
                                     <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Máquina</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Detalhes</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Produto</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Qtd.</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Refugo (kg)</th>
                                     <th class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">Ação</th>
                                 </tr>
                             </thead>
@@ -442,20 +309,20 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            // --- VARIÁVEIS GLOBAIS ---
+            // --- VARIÁVEIS GLOBAIS DO SCRIPT ---
             let plannedMachinesData = [];
-            let fullDashboardData = { perdas: [], paradas: [] };
+            let fullDashboardData = [];
             let currentParetoMode = 'refugo';
-            let paretoChartInstance, oeeChartInstance, paretoParadaChartInstance, productionTimelineChartInstance;
-            let productDataMap = new Map();
+            let paretoChartInstance = null;
+            let turnoChartInstance = null;
+            let pieceWeightMap = new Map();
             let kpiValues = {};
             let refugoViewMode = 'kg';
 
             // --- SELETORES DE DOM ---
             const machineSelect = document.getElementById('maquina');
             const opInput = document.getElementById('op');
-            const productionForm = document.getElementById('production-form');
-            const paradaForm = document.getElementById('parada-form');
+            const form = document.getElementById('production-form');
             const tabButtons = document.querySelectorAll('.tab-btn');
             const tabPanes = document.querySelectorAll('.tab-pane');
             const startDateSelector = document.getElementById('start-date-selector');
@@ -468,9 +335,8 @@
             const refreshVerificacaoBtn = document.getElementById('refresh-verificacao-btn');
             const verificacaoTableBody = document.getElementById('verificacao-table-body');
             const refugoCard = document.getElementById('refugo-card');
-            const maquinaParadaSelect = document.getElementById('maquina-parada');
 
-            // --- LÓGICA PRINCIPAL ---
+            // --- FUNÇÕES DE LÓGICA PRINCIPAL ---
             const init = () => {
                 lucide.createIcons();
                 setTodayDate();
@@ -479,17 +345,16 @@
             };
 
             const setupEventListeners = () => {
-                machineSelect.addEventListener('change', onMachineSelectChange);
-                productionForm.addEventListener('submit', handleProductionFormSubmit);
-                paradaForm.addEventListener('submit', handleParadaFormSubmit);
-                tabButtons.forEach(button => button.addEventListener('click', handleTabClick));
-                refreshDashboardBtn.addEventListener('click', loadDashboardData);
-                machineFilter.addEventListener('change', () => processAndRenderDashboard(fullDashboardData));
-                paretoRefugoBtn.addEventListener('click', () => setParetoMode('refugo'));
-                paretoBorrasBtn.addEventListener('click', () => setParetoMode('borras'));
-                refugoCard.addEventListener('click', toggleRefugoView);
-                refreshVerificacaoBtn.addEventListener('click', loadVerificacaoData);
-                verificacaoTableBody.addEventListener('click', handleVerificacaoTableClick);
+                if (machineSelect) machineSelect.addEventListener('change', onMachineSelectChange);
+                if (form) form.addEventListener('submit', handleFormSubmit);
+                if (tabButtons) tabButtons.forEach(button => button.addEventListener('click', handleTabClick));
+                if (refreshDashboardBtn) refreshDashboardBtn.addEventListener('click', loadDashboardData);
+                if (machineFilter) machineFilter.addEventListener('change', () => processAndRenderDashboard(fullDashboardData));
+                if (paretoRefugoBtn) paretoRefugoBtn.addEventListener('click', () => setParetoMode('refugo'));
+                if (paretoBorrasBtn) paretoBorrasBtn.addEventListener('click', () => setParetoMode('borras'));
+                if (refugoCard) refugoCard.addEventListener('click', toggleRefugoView);
+                if (refreshVerificacaoBtn) refreshVerificacaoBtn.addEventListener('click', loadVerificacaoData);
+                if (verificacaoTableBody) verificacaoTableBody.addEventListener('click', handleVerificacaoTableClick);
                 
                 const confirmModal = document.getElementById('confirm-modal');
                 if(confirmModal) {
@@ -505,98 +370,42 @@
                 opInput.value = machinePlan ? machinePlan.product || '' : '';
             };
 
-            const handleProductionFormSubmit = async (e) => {
+            const handleFormSubmit = async (e) => {
                 e.preventDefault();
                 const submitButton = document.getElementById('submit-button');
+                const buttonText = submitButton.querySelector('span');
                 const statusMessage = document.getElementById('status-message');
-                await handleGenericFormSubmit(productionForm, "perdas", submitButton, statusMessage, "Lançamento salvo com sucesso!");
+                submitButton.disabled = true;
+                buttonText.textContent = 'A enviar...';
+                statusMessage.textContent = '';
+                const formData = new FormData(form);
+                const dataToSave = {
+                    operador: formData.get('operador'), maquina: formData.get('maquina'), turno: formData.get('turno'),
+                    produto: formData.get('produto'), produzido: Number(formData.get('produzido')), triagem: Number(formData.get('triagem')),
+                    refugo: Number(formData.get('refugo')), borras: Number(formData.get('borras')), perdas: formData.get('perdas'),
+                    timestamp: Timestamp.now()
+                };
+                try {
+                    await addDoc(collection(db, "perdas"), dataToSave);
+                    statusMessage.textContent = 'Lançamento salvo com sucesso!';
+                    statusMessage.className = 'text-sm font-semibold h-5 text-center text-green-600 fade-in-out';
+                    form.reset();
+                    opInput.value = '';
+                    machineSelect.value = '';
+                } catch (error) {
+                    console.error('Erro ao salvar no Firebase:', error);
+                    statusMessage.textContent = `Erro ao salvar: ${error.message}`;
+                    statusMessage.className = 'text-sm font-semibold h-5 text-center text-red-600';
+                } finally {
+                    setTimeout(() => {
+                        submitButton.disabled = false;
+                        buttonText.textContent = 'Enviar Lançamento';
+                        if (!statusMessage.classList.contains('text-red-600')) {
+                             setTimeout(() => { statusMessage.textContent = ''; }, 4000);
+                        }
+                    }, 500);
+                }
             };
-
-            const handleParadaFormSubmit = async (e) => {
-                e.preventDefault();
-                const submitButton = document.getElementById('submit-parada-button');
-                const statusMessage = document.getElementById('status-parada-message');
-                await handleGenericFormSubmit(paradaForm, "paradas", submitButton, statusMessage, "Parada salva com sucesso!");
-            };
-
-            async function handleGenericFormSubmit(formElement, collectionName, button, status, successMessage) {
-                 const buttonText = button.querySelector('span') || button;
-                 const originalButtonText = buttonText.textContent;
-                 button.disabled = true;
-                 buttonText.textContent = 'A enviar...';
-                 status.textContent = '';
-                 
-                 const formData = new FormData(formElement);
-                 const dataToSave = Object.fromEntries(formData.entries());
-
-                 // Garante que pelo menos um dos campos de perda/produção tenha valor
-                 if(collectionName === 'perdas') {
-                     const { produzido, refugo, borras, triagem } = dataToSave;
-                     if(Number(produzido) === 0 && Number(refugo) === 0 && Number(borras) === 0 && Number(triagem) === 0) {
-                         status.textContent = 'Preencha ao menos um campo: Produção, Refugo, Borras ou Triagem.';
-                         status.className = 'text-sm font-semibold h-5 text-center text-red-600';
-                         button.disabled = false;
-                         buttonText.textContent = originalButtonText;
-                         return;
-                     }
-                 }
-
-                 // Converte campos numéricos
-                 for (const key in dataToSave) {
-                    if (!isNaN(dataToSave[key]) && dataToSave[key] !== '' && typeof dataToSave[key] === 'string') {
-                         dataToSave[key] = Number(dataToSave[key]);
-                    }
-                 }
-                 
-                 // Calcula duração da parada
-                 if(collectionName === 'paradas') {
-                     const { hora_inicio, hora_fim } = dataToSave;
-                     if (!hora_inicio || !hora_fim) {
-                        status.textContent = 'Hora de início e fim são obrigatórias.';
-                        status.className = 'text-sm font-semibold h-5 text-center text-red-600';
-                        button.disabled = false;
-                        buttonText.textContent = originalButtonText;
-                        return;
-                     }
-                     const diff = new Date(`1970-01-01T${hora_fim}`) - new Date(`1970-01-01T${hora_inicio}`);
-                     if (diff < 0) {
-                         status.textContent = 'A hora final não pode ser menor que a inicial.';
-                         status.className = 'text-sm font-semibold h-5 text-center text-red-600';
-                         button.disabled = false;
-                         buttonText.textContent = originalButtonText;
-                         return;
-                     }
-                     dataToSave.duracao_min = diff / 60000;
-                 }
-
-                 dataToSave.timestamp = Timestamp.now();
-                 
-                 try {
-                     await addDoc(collection(db, collectionName), dataToSave);
-                     status.textContent = successMessage;
-                     status.className = 'text-sm font-semibold h-5 text-center text-green-600 fade-in-out';
-                     formElement.reset();
-                     if(formElement === productionForm) {
-                        opInput.value = '';
-                        machineSelect.value = '';
-                        document.getElementById('produzido').value = '0';
-                     } else {
-                        maquinaParadaSelect.value = '';
-                     }
-                 } catch (error) {
-                     console.error(`Erro ao salvar em ${collectionName}:`, error);
-                     status.textContent = `Erro ao salvar: ${error.message}`;
-                     status.className = 'text-sm font-semibold h-5 text-center text-red-600';
-                 } finally {
-                     setTimeout(() => {
-                         button.disabled = false;
-                         buttonText.textContent = originalButtonText;
-                         if (!status.classList.contains('text-red-600')) {
-                              setTimeout(() => { status.textContent = ''; }, 4000);
-                         }
-                     }, 500);
-                 }
-            }
 
             const handleTabClick = (e) => {
                 const tabId = e.currentTarget.dataset.tab;
@@ -605,7 +414,7 @@
                 tabPanes.forEach(pane => {
                     pane.style.display = pane.id === `${tabId}-tab` ? 'block' : 'none';
                 });
-                if (tabId === 'dashboard' && fullDashboardData.perdas.length === 0 && fullDashboardData.paradas.length === 0) loadDashboardData();
+                if (tabId === 'dashboard') loadDashboardData();
                 if (tabId === 'verificacao') loadVerificacaoData();
             };
 
@@ -624,30 +433,28 @@
             const handleVerificacaoTableClick = (e) => {
                 const deleteBtn = e.target.closest('.delete-btn');
                 if (deleteBtn) {
-                    showConfirmModal(deleteBtn.dataset.id, deleteBtn.dataset.collection);
+                    showConfirmModal(deleteBtn.dataset.id);
                 }
             };
 
             // --- FUNÇÕES DE DADOS E API ---
             async function fetchPlannedMachines() {
-                [machineSelect, maquinaParadaSelect].forEach(sel => {
-                    sel.innerHTML = `<option value="">A carregar máquinas...</option>`;
-                    sel.disabled = true;
-                });
+                machineSelect.innerHTML = `<option value="">A carregar máquinas...</option>`;
+                machineSelect.disabled = true;
                 const productionDay = getProductionDateString();
-                const url = `${SUPABASE_URL}/rest/v1/production_plan?select=machine,product,piece_weight,budgeted_cycle,mold_cavities&date=eq.${productionDay}`;
+                const url = `${SUPABASE_URL}/rest/v1/production_plan?select=machine,product,piece_weight&date=eq.${productionDay}`;
                 try {
                     const response = await fetch(url, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
                     if (!response.ok) throw new Error(`Erro na rede: ${response.statusText}`);
                     const data = await response.json();
                     plannedMachinesData = data;
-                    populateMachineSelects(plannedMachinesData);
+                    populateMachineSelect(plannedMachinesData);
                 } catch (error) {
                     console.error('Erro ao buscar máquinas planeadas:', error);
-                    [machineSelect, maquinaParadaSelect].forEach(sel => sel.innerHTML = `<option value="">Erro ao carregar</option>`);
+                    machineSelect.innerHTML = `<option value="">Erro ao carregar</option>`;
                     alert(`Não foi possível carregar o planeamento: ${error.message}`);
                 } finally {
-                    [machineSelect, maquinaParadaSelect].forEach(sel => sel.disabled = false);
+                    machineSelect.disabled = false;
                 }
             }
 
@@ -668,31 +475,19 @@
                     const startDate = new Date(startDateStr + 'T07:00:00');
                     const endDate = new Date(endDateStr + 'T07:00:00');
                     endDate.setDate(endDate.getDate() + 1);
+                    const q = query(collection(db, "perdas"), where("timestamp", ">=", Timestamp.fromDate(startDate)), where("timestamp", "<", Timestamp.fromDate(endDate)));
+                    const querySnapshot = await getDocs(q);
                     
-                    const perdasQuery = query(collection(db, "perdas"), where("timestamp", ">=", Timestamp.fromDate(startDate)), where("timestamp", "<", Timestamp.fromDate(endDate)));
-                    const paradasQuery = query(collection(db, "paradas"), where("timestamp", ">=", Timestamp.fromDate(startDate)), where("timestamp", "<", Timestamp.fromDate(endDate)));
-
-                    const [perdasSnapshot, paradasSnapshot] = await Promise.all([getDocs(perdasQuery), getDocs(paradasQuery)]);
-
-                    const url = `${SUPABASE_URL}/rest/v1/production_plan?select=product,piece_weight,budgeted_cycle,mold_cavities&date=gte.${startDateStr}&date=lte.${endDateStr}`;
+                    const url = `${SUPABASE_URL}/rest/v1/production_plan?select=product,piece_weight&date=gte.${startDateStr}&date=lte.${endDateStr}`;
                     const response = await fetch(url, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
-                    if (!response.ok) throw new Error(`Erro na rede ao buscar dados do plano: ${response.statusText}`);
-                    const planData = await response.json();
-                    productDataMap.clear();
-                    planData.forEach(item => { 
-                        if (item.product) { 
-                            productDataMap.set(item.product, {
-                                weight: item.piece_weight,
-                                cycle: item.budgeted_cycle,
-                                cavities: item.mold_cavities
-                            }); 
-                        }
-                    });
+                    if (!response.ok) throw new Error(`Erro na rede ao buscar pesos: ${response.statusText}`);
+                    const weightsData = await response.json();
+                    pieceWeightMap.clear();
+                    weightsData.forEach(item => { if (item.product && item.piece_weight) { pieceWeightMap.set(item.product, item.piece_weight); }});
                     
-                    fullDashboardData.perdas = perdasSnapshot.docs.map(doc => doc.data());
-                    fullDashboardData.paradas = paradasSnapshot.docs.map(doc => doc.data());
-
-                    populateMachineFilter(fullDashboardData.perdas);
+                    fullDashboardData = [];
+                    querySnapshot.forEach((doc) => { fullDashboardData.push(doc.data()); });
+                    populateMachineFilter(fullDashboardData);
                     processAndRenderDashboard(fullDashboardData);
                     dashboardContent.style.display = 'block';
                 } catch (error) {
@@ -716,21 +511,12 @@
                     const startDate = new Date(dateStr + 'T07:00:00');
                     const endDate = new Date(dateStr + 'T07:00:00');
                     endDate.setDate(endDate.getDate() + 1);
-
-                    const perdasQuery = query(collection(db, "perdas"), where("timestamp", ">=", Timestamp.fromDate(startDate)), where("timestamp", "<", Timestamp.fromDate(endDate)), orderBy("timestamp", "desc"));
-                    const paradasQuery = query(collection(db, "paradas"), where("timestamp", ">=", Timestamp.fromDate(startDate)), where("timestamp", "<", Timestamp.fromDate(endDate)), orderBy("timestamp", "desc"));
-                    
-                    const [perdasSnapshot, paradasSnapshot] = await Promise.all([getDocs(perdasQuery), getDocs(paradasQuery)]);
-
-                    const allData = [
-                        ...perdasSnapshot.docs.map(doc => ({ id: doc.id, collection: 'perdas', ...doc.data() })),
-                        ...paradasSnapshot.docs.map(doc => ({ id: doc.id, collection: 'paradas', ...doc.data() }))
-                    ].sort((a,b) => b.timestamp.toMillis() - a.timestamp.toMillis());
-
-                    if (allData.length === 0) {
+                    const q = query(collection(db, "perdas"), where("timestamp", ">=", Timestamp.fromDate(startDate)), where("timestamp", "<", Timestamp.fromDate(endDate)), orderBy("timestamp", "desc"));
+                    const querySnapshot = await getDocs(q);
+                    if (querySnapshot.empty) {
                         noData.style.display = 'block';
                     } else {
-                        allData.forEach(doc => renderVerificacaoRow(doc));
+                        querySnapshot.forEach(doc => renderVerificacaoRow({ id: doc.id, ...doc.data() }));
                     }
                 } catch (error) {
                     console.error("Erro ao buscar dados para verificação:", error);
@@ -741,21 +527,17 @@
             }
 
             // --- FUNÇÕES DE RENDERIZAÇÃO E UI ---
-            function populateMachineSelects(machines) {
-                const machineSelectors = [machineSelect, maquinaParadaSelect];
+            function populateMachineSelect(machines) {
                 if (!machines || machines.length === 0) {
-                    machineSelectors.forEach(sel => sel.innerHTML = '<option value="">Nenhuma máquina no plano de hoje</option>'); 
-                    return;
+                    machineSelect.innerHTML = '<option value="">Nenhuma máquina no plano de hoje</option>'; return;
                 }
+                machineSelect.innerHTML = '<option value="">Selecione uma Máquina</option>';
                 const uniqueMachines = [...new Set(machines.map(item => item.machine))].sort((a, b) => parseInt(a.split('-')[1]) - parseInt(b.split('-')[1]));
-                machineSelectors.forEach(sel => {
-                    sel.innerHTML = '<option value="">Selecione uma Máquina</option>';
-                    uniqueMachines.forEach(machine => {
-                        const option = document.createElement('option');
-                        option.value = machine;
-                        option.textContent = machine;
-                        sel.appendChild(option);
-                    });
+                uniqueMachines.forEach(machine => {
+                    const option = document.createElement('option');
+                    option.value = machine;
+                    option.textContent = machine;
+                    machineSelect.appendChild(option);
                 });
             }
 
@@ -771,11 +553,10 @@
                 });
                 if (machines.includes(currentVal)) { machineFilter.value = currentVal; }
             }
-                
-            function processAndRenderDashboard({ perdas, paradas }) {
+             
+            function processAndRenderDashboard(data) {
                 const selectedMachine = machineFilter.value;
-                const filteredPerdas = selectedMachine === 'total' ? perdas : perdas.filter(row => row.maquina === selectedMachine);
-                const filteredParadas = selectedMachine === 'total' ? paradas : paradas.filter(row => row.maquina === selectedMachine);
+                const filteredData = selectedMachine === 'total' ? data : data.filter(row => row.maquina === selectedMachine);
                 
                 const noDataMessage = (ctx) => {
                     if (!ctx) return;
@@ -789,130 +570,71 @@
                     ctx.restore();
                 };
 
-                const totalProduzido = filteredPerdas.reduce((sum, row) => sum + (row.produzido || 0), 0);
-                const totalRefugoKg = filteredPerdas.reduce((sum, row) => sum + (row.refugo || 0), 0);
-                const totalTriagem = filteredPerdas.reduce((sum, row) => sum + (row.triagem || 0), 0);
-                const totalBorras = filteredPerdas.reduce((sum, row) => sum + (row.borras || 0), 0);
-                const totalParadaMin = filteredParadas.reduce((sum, row) => sum + (row.duracao_min || 0), 0);
-                const totalRefugoPcs = filteredPerdas.reduce((sum, row) => {
-                    const plan = productDataMap.get(row.produto);
-                    if (plan && plan.weight > 0 && row.refugo > 0) {
-                        return sum + ((row.refugo * 1000) / plan.weight);
+                if (!filteredData || filteredData.length === 0) {
+                    kpiValues = { producao: 0, refugoKg: 0, refugoPcs: 0, triagem: 0, borras: 0 };
+                    updateKpiCards();
+                    if (paretoChartInstance) paretoChartInstance.destroy();
+                    if (turnoChartInstance) turnoChartInstance.destroy();
+                    noDataMessage(document.getElementById('paretoChart')?.getContext('2d'));
+                    noDataMessage(document.getElementById('turnoChart')?.getContext('2d'));
+                    return;
+                }
+                const totalProduzido = filteredData.reduce((sum, row) => sum + Number(row.produzido || 0), 0);
+                const totalRefugoKg = filteredData.reduce((sum, row) => sum + Number(row.refugo || 0), 0);
+                const totalTriagem = filteredData.reduce((sum, row) => sum + Number(row.triagem || 0), 0);
+                const totalBorras = filteredData.reduce((sum, row) => sum + Number(row.borras || 0), 0);
+                const totalRefugoPcs = filteredData.reduce((sum, row) => {
+                    const weight = pieceWeightMap.get(row.produto);
+                    if (weight && weight > 0 && row.refugo > 0) {
+                        return sum + ((row.refugo * 1000) / weight);
                     }
                     return sum;
                 }, 0);
                 
-                kpiValues = { producao: totalProduzido, refugoKg: totalRefugoKg, refugoPcs: totalRefugoPcs, triagem: totalTriagem, borras: totalBorras, parada: totalParadaMin };
+                kpiValues = { producao: totalProduzido, refugoKg: totalRefugoKg, refugoPcs: totalRefugoPcs, triagem: totalTriagem, borras: totalBorras };
                 updateKpiCards();
-                calculateAndDisplayOEE(filteredPerdas, filteredParadas);
-                renderProductionTimelineChart(filteredPerdas, selectedMachine);
 
                 if (currentParetoMode === 'refugo') {
-                    document.getElementById('pareto-title').innerHTML = `<i data-lucide="bar-chart-3" class="text-red-500"></i>Principais Motivos de Refugo`;
-                    const refugoPorMotivo = filteredPerdas.reduce((acc, row) => {
+                    document.getElementById('pareto-title').innerHTML = `<i data-lucide="bar-chart-3" class="text-red-500"></i>Principais Motivos de Perdas`;
+                    const refugoPorMotivo = filteredData.reduce((acc, row) => {
                         const motivo = row.perdas;
-                        const refugo = row.refugo || 0;
+                        const refugo = Number(row.refugo || 0);
                         if (motivo && motivo !== 'N/A' && refugo > 0) { acc[motivo] = (acc[motivo] || 0) + refugo; }
                         return acc;
                     }, {});
                     const sortedRefugo = Object.entries(refugoPorMotivo).sort(([, a], [, b]) => b - a);
-                    if (sortedRefugo.length > 0) renderParetoChart(sortedRefugo, 'Refugo (kg)', 'rgba(239, 68, 68, 0.7)');
-                    else noDataMessage(document.getElementById('paretoChart')?.getContext('2d'));
+                    renderParetoChart(sortedRefugo, 'Refugo (kg)', 'rgba(239, 68, 68, 0.7)');
                 } else { 
                     document.getElementById('pareto-title').innerHTML = `<i data-lucide="bar-chart-3" class="text-green-500"></i>Maiores Geradores de Borras`;
-                    const borrasPorMaquina = filteredPerdas.reduce((acc, row) => {
+                    const borrasPorMaquina = (selectedMachine === 'total' ? data : [data.find(row => row.maquina === selectedMachine)].filter(Boolean))
+                        .reduce((acc, row) => {
                             const maquina = row.maquina;
-                            const borras = row.borras || 0;
+                            const borras = Number(row.borras || 0);
                             if (maquina && borras > 0) { acc[maquina] = (acc[maquina] || 0) + borras; }
                             return acc;
                         }, {});
                     const sortedBorras = Object.entries(borrasPorMaquina).sort(([, a], [, b]) => b - a);
-                    if (sortedBorras.length > 0) renderParetoChart(sortedBorras, 'Borras (kg)', 'rgba(34, 197, 94, 0.7)');
-                    else noDataMessage(document.getElementById('paretoChart')?.getContext('2d'));
+                    renderParetoChart(sortedBorras, 'Borras (kg)', 'rgba(34, 197, 94, 0.7)');
                 }
-
-                const paradaPorMotivo = filteredParadas.reduce((acc, row) => {
-                    const motivo = row.motivo;
-                    const duracao = row.duracao_min || 0;
-                    if (motivo && duracao > 0) { acc[motivo] = (acc[motivo] || 0) + duracao; }
+                
+                const perdasPorTurno = filteredData.reduce((acc, row) => {
+                    const turno = `${row.turno}º Turno`;
+                    if(acc[turno]) {
+                       acc[turno].refugo += Number(row.refugo || 0);
+                       acc[turno].borras += Number(row.borras || 0);
+                    }
                     return acc;
-                }, {});
-                const sortedParadas = Object.entries(paradaPorMotivo).sort(([, a], [, b]) => b - a);
-                if (sortedParadas.length > 0) renderParetoParadaChart(sortedParadas);
-                else noDataMessage(document.getElementById('paretoParadaChart')?.getContext('2d'));
+                }, { "1º Turno": {refugo: 0, borras: 0}, "2º Turno": {refugo: 0, borras: 0}, "3º Turno": {refugo: 0, borras: 0} });
                 
+                renderTurnoChart(perdasPorTurno);
                 lucide.createIcons();
-            }
-
-            function calculateAndDisplayOEE(perdasData, paradasData) {
-                const TEMPO_TURNO_MIN = 450;
-                const totalTurnos = new Set(perdasData.map(p => `${p.maquina}-${p.turno}`)).size;
-                
-                if(totalTurnos === 0) {
-                    updateOeeKpis({ availability: 0, performance: 0, quality: 0, oee: 0 });
-                    renderOeeChart({ availability: 0, performance: 0, quality: 0, oee: 0 });
-                    return;
-                }
-
-                const tempoTotalPlanejado = totalTurnos * TEMPO_TURNO_MIN;
-                const tempoTotalParada = paradasData.reduce((sum, row) => sum + (row.duracao_min || 0), 0);
-                
-                const tempoProduzindo = tempoTotalPlanejado - tempoTotalParada;
-                const availability = tempoTotalPlanejado > 0 ? (tempoProduzindo / tempoTotalPlanejado) : 0;
-
-                const totalProduzido = perdasData.reduce((sum, row) => sum + (row.produzido || 0), 0);
-                const totalRefugoPcs = perdasData.reduce((sum, row) => {
-                    const plan = productDataMap.get(row.produto);
-                    if (plan && plan.weight > 0 && row.refugo > 0) {
-                        return sum + ((row.refugo * 1000) / plan.weight);
-                    }
-                    return sum;
-                }, 0);
-
-                const totalProduzidoIdeal = perdasData.reduce((sum, row) => {
-                    const plan = productDataMap.get(row.produto);
-                    const paradasDoTurno = paradasData.filter(p => p.maquina === row.maquina && p.turno === row.turno);
-                    const paradaTurnoMin = paradasDoTurno.reduce((s, p) => s + p.duracao_min, 0);
-                    const tempoProduzindoTurno = TEMPO_TURNO_MIN - paradaTurnoMin;
-                    
-                    if(plan && plan.cycle > 0 && tempoProduzindoTurno > 0) {
-                        const pecasPorMinutoIdeal = (plan.cavities / plan.cycle) * 60;
-                        return sum + (pecasPorMinutoIdeal * tempoProduzindoTurno);
-                    }
-                    return sum;
-                }, 0);
-                
-                const performance = totalProduzidoIdeal > 0 ? (totalProduzido / totalProduzidoIdeal) : 0;
-                
-                const pecasBoas = totalProduzido - totalRefugoPcs;
-                const quality = totalProduzido > 0 ? (pecasBoas / totalProduzido) : 0;
-
-                const oee = availability * performance * quality;
-
-                const results = {
-                    availability: availability * 100,
-                    performance: performance * 100,
-                    quality: quality * 100,
-                    oee: oee * 100
-                };
-
-                updateOeeKpis(results);
-                renderOeeChart(results);
             }
 
             function updateKpiCards() {
                 document.getElementById('kpi-producao').textContent = (kpiValues.producao || 0).toLocaleString('pt-BR');
+                document.getElementById('kpi-triagem').textContent = (kpiValues.triagem || 0).toLocaleString('pt-BR');
                 document.getElementById('kpi-borras').textContent = `${(kpiValues.borras || 0).toFixed(2)} kg`;
-                document.getElementById('kpi-parada').textContent = `${Math.round(kpiValues.parada || 0)} min`;
                 updateRefugoCard();
-            }
-
-            function updateOeeKpis(oeeData) {
-                 const formatPercent = (val) => isNaN(val) ? '0.0%' : val.toFixed(1) + '%';
-                document.getElementById('kpi-disponibilidade').textContent = formatPercent(oeeData.availability);
-                document.getElementById('kpi-performance').textContent = formatPercent(oeeData.performance);
-                document.getElementById('kpi-qualidade').textContent = formatPercent(oeeData.quality);
-                document.getElementById('kpi-oee').textContent = formatPercent(oeeData.oee);
             }
 
             function updateRefugoCard() {
@@ -932,87 +654,10 @@
                 if (paretoChartInstance) paretoChartInstance.destroy();
                 paretoChartInstance = new Chart(ctx, { type: 'bar', data: { labels: data.map(item => item[0]), datasets: [{ label: label, data: data.map(item => item[1]), backgroundColor: color, borderColor: color.replace('0.7', '1'), borderWidth: 1, borderRadius: 4, }] }, options: { scales: { y: { beginAtZero: true } } } });
             }
-
-            function renderParetoParadaChart(data) {
-                const ctx = document.getElementById('paretoParadaChart').getContext('2d');
-                if (paretoParadaChartInstance) paretoParadaChartInstance.destroy();
-                paretoParadaChartInstance = new Chart(ctx, { type: 'bar', data: { labels: data.map(item => item[0]), datasets: [{ label: 'Tempo de Parada (min)', data: data.map(item => item[1]), backgroundColor: 'rgba(249, 115, 22, 0.7)', borderColor: 'rgba(249, 115, 22, 1)', borderWidth: 1, borderRadius: 4, }] }, options: { scales: { y: { beginAtZero: true } } } });
-            }
-            
-            function renderOeeChart(data) {
-                const ctx = document.getElementById('oeeChart').getContext('2d');
-                if (oeeChartInstance) oeeChartInstance.destroy();
-                const chartData = [ data.availability, data.performance, data.quality, data.oee ];
-                oeeChartInstance = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Disponibilidade', 'Performance', 'Qualidade', 'OEE Geral'],
-                        datasets: [{
-                            label: 'Indicador de Eficiência', data: chartData,
-                            backgroundColor: [ 'rgba(20, 184, 166, 0.7)', 'rgba(14, 165, 233, 0.7)', 'rgba(245, 158, 11, 0.7)', 'rgba(59, 130, 246, 0.8)' ],
-                            borderColor: [ 'rgba(13, 148, 136, 1)', 'rgba(2, 132, 199, 1)', 'rgba(217, 119, 6, 1)', 'rgba(37, 99, 235, 1)' ],
-                            borderWidth: 1, borderRadius: 4,
-                        }]
-                    },
-                    options: {
-                        indexAxis: 'y',
-                        scales: { x: { beginAtZero: true, max: 100, ticks: { callback: (value) => value + '%' } } },
-                        plugins: { legend: { display: false } },
-                        responsive: true, maintainAspectRatio: true
-                    }
-                });
-            }
-
-            function renderProductionTimelineChart(data, selectedMachine) {
-                const container = document.getElementById('production-timeline-container');
-                const canvas = document.getElementById('productionTimelineChart');
-                const message = document.getElementById('timeline-chart-message');
-
-                if (selectedMachine === 'total') {
-                    canvas.style.display = 'none';
-                    message.style.display = 'block';
-                    if (productionTimelineChartInstance) productionTimelineChartInstance.destroy();
-                    return;
-                }
-                
-                canvas.style.display = 'block';
-                message.style.display = 'none';
-
-                const labels = ['07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '00', '01', '02', '03', '04', '05', '06'].map(h => h+':00');
-                const hourlyData = new Array(24).fill(0);
-
-                data.forEach(record => {
-                    if (record.produzido > 0) {
-                        const hour = record.timestamp.toDate().getHours();
-                        const index = hour >= 7 ? hour - 7 : hour + 17;
-                        if (index >= 0 && index < 24) {
-                            hourlyData[index] += record.produzido;
-                        }
-                    }
-                });
-                
-                const ctx = canvas.getContext('2d');
-                if (productionTimelineChartInstance) productionTimelineChartInstance.destroy();
-                productionTimelineChartInstance = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Produção por Hora (peças)',
-                            data: hourlyData,
-                            borderColor: 'rgba(79, 70, 229, 1)',
-                            backgroundColor: 'rgba(79, 70, 229, 0.1)',
-                            fill: true,
-                            tension: 0.2
-                        }]
-                    },
-                    options: {
-                        scales: { y: { beginAtZero: true } },
-                        plugins: { legend: { display: false } },
-                        responsive: true,
-                        maintainAspectRatio: false
-                    }
-                });
+            function renderTurnoChart(data) {
+                const ctx = document.getElementById('turnoChart').getContext('2d');
+                if (turnoChartInstance) turnoChartInstance.destroy();
+                turnoChartInstance = new Chart(ctx, { type: 'bar', data: { labels: Object.keys(data).sort(), datasets: [{ label: 'Refugo (kg)', data: Object.keys(data).sort().map(turno => data[turno].refugo), backgroundColor: 'rgba(239, 68, 68, 0.7)', borderColor: 'rgba(239, 68, 68, 1)', borderWidth: 1, borderRadius: 4, }, { label: 'Borras (kg)', data: Object.keys(data).sort().map(turno => data[turno].borras), backgroundColor: 'rgba(34, 197, 94, 0.7)', borderColor: 'rgba(34, 197, 94, 1)', borderWidth: 1, borderRadius: 4, }] }, options: { scales: { x: { stacked: false }, y: { stacked: false, beginAtZero: true } }, responsive: true, maintainAspectRatio: true } });
             }
             
             function renderVerificacaoRow(data) {
@@ -1020,25 +665,15 @@
                 row.className = 'hover:bg-slate-50';
                 const timestamp = data.timestamp.toDate();
                 const formattedDate = timestamp.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-
-                let details = '';
-                let type, iconColor;
-
-                if(data.collection === 'perdas') {
-                    type = 'Produção'; iconColor = 'text-blue-500';
-                    details = `Qtd: <strong>${data.produzido}</strong>, Refugo: <strong>${data.refugo}kg</strong> (${data.perdas})`;
-                } else { // parada
-                    type = 'Parada'; iconColor = 'text-amber-500';
-                    details = `Duração: <strong>${data.duracao_min} min</strong> (${data.motivo})`;
-                }
-
                 row.innerHTML = `
-                    <td class="px-4 py-3 text-sm text-slate-700 font-semibold ${iconColor}"><i data-lucide="${data.collection === 'perdas' ? 'package' : 'timer'}" class="w-4 h-4 inline-block mr-2"></i>${type}</td>
                     <td class="px-4 py-3 text-sm text-slate-700">${formattedDate}</td>
+                    <td class="px-4 py-3 text-sm text-slate-700">${data.operador}</td>
                     <td class="px-4 py-3 text-sm text-slate-700">${data.maquina}</td>
-                    <td class="px-4 py-3 text-sm text-slate-700">${details}</td>
+                    <td class="px-4 py-3 text-sm text-slate-700 truncate" title="${data.produto}">${data.produto}</td>
+                    <td class="px-4 py-3 text-sm text-slate-700">${data.produzido}</td>
+                    <td class="px-4 py-3 text-sm text-slate-700">${data.refugo}</td>
                     <td class="px-4 py-3 text-center">
-                        <button data-id="${data.id}" data-collection="${data.collection}" class="delete-btn text-red-500 hover:text-red-700 p-1 rounded-md hover:bg-red-100">
+                        <button data-id="${data.id}" class="delete-btn text-red-500 hover:text-red-700 p-1 rounded-md hover:bg-red-100">
                             <i data-lucide="trash-2" class="w-4 h-4"></i>
                         </button>
                     </td>
@@ -1048,22 +683,19 @@
             }
 
             let docIdToDelete = null;
-            let collectionToDelete = null;
             const confirmModal = document.getElementById('confirm-modal');
-            const showConfirmModal = (id, collection) => {
+            const showConfirmModal = (id) => {
                 docIdToDelete = id;
-                collectionToDelete = collection;
                 confirmModal.classList.remove('hidden');
             };
             const hideConfirmModal = () => {
                 confirmModal.classList.add('hidden');
                 docIdToDelete = null;
-                collectionToDelete = null;
             };
             const executeDelete = async () => {
-                if (!docIdToDelete || !collectionToDelete) return;
+                if (!docIdToDelete) return;
                 try {
-                    await deleteDoc(doc(db, collectionToDelete, docIdToDelete));
+                    await deleteDoc(doc(db, "perdas", docIdToDelete));
                     alert("Lançamento excluído com sucesso!");
                     loadVerificacaoData();
                 } catch (error) {
@@ -1081,10 +713,10 @@
                 verificacaoDateSelector.value = todayString;
             };
             
+            // --- INICIALIZAÇÃO ---
             init();
         });
     </script>
 </body>
 </html>
-
 
