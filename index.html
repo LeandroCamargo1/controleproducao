@@ -3,720 +3,502 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hokkaido Synchro - Controle de Perdas v2.11</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+    <title>Calculadora de Probabilidade - Poker</title>
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
-        
-        @keyframes fadeInOut { 0%, 100% { opacity: 0; } 10%, 90% { opacity: 1; } }
-        .fade-in-out { animation: fadeInOut 4s ease-in-out forwards; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-        .tab-btn.active {
-            border-bottom-color: #0891b2; /* cyan-600 */
-            color: #0e7490; /* cyan-700 */
-            font-weight: 600;
-        }
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type=number] { -moz-appearance: textfield; }
-        .pareto-toggle.active {
-            background-color: #0891b2; /* cyan-600 */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a5d1a 0%, #0d2d0d 100%);
+            min-height: 100vh;
+            padding: 10px;
             color: white;
+            overflow: hidden;
         }
-        .kpi-card-interactive {
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            font-size: 1.6em;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 15px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-height: 0;
+        }
+
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .section {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 12px;
+        }
+
+        .section h2 {
+            margin-bottom: 8px;
+            color: #ffd700;
+            font-size: 1em;
+        }
+
+        .cards-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .hand-section, .board-section {
+            flex: 1;
+        }
+
+        .selected-cards {
+            display: flex;
+            gap: 8px;
+            min-height: 70px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .card-slot {
+            width: 50px;
+            height: 70px;
+            border: 2px dashed rgba(255,255,255,0.3);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .card {
+            width: 50px;
+            height: 70px;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.3);
         }
-        .kpi-card-interactive:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 4px 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .card.selected {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .card.in-selection {
+            cursor: pointer;
+        }
+
+        .card.in-selection:hover {
+            transform: scale(1.05);
+        }
+
+        .card .rank {
+            font-size: 18px;
+        }
+
+        .card .suit {
+            font-size: 20px;
+        }
+
+        .red { color: #d32f2f; }
+        .black { color: #1a1a1a; }
+
+        .card.hearts, .card.diamonds {
+            background: linear-gradient(145deg, #ffffff, #f0f0f0);
+        }
+
+        .card.spades, .card.clubs {
+            background: linear-gradient(145deg, #ffffff, #f0f0f0);
+        }
+
+        .deck-section {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+        }
+
+        .suit-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-bottom: 8px;
+            justify-content: center;
+        }
+
+        .mini-card {
+            width: 38px;
+            height: 52px;
+            font-size: 10px;
+        }
+
+        .mini-card .rank {
+            font-size: 14px;
+        }
+
+        .mini-card .suit {
+            font-size: 16px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            padding: 8px 0;
+        }
+
+        button {
+            padding: 8px 20px;
+            font-size: 14px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-calculate {
+            background: linear-gradient(145deg, #ffd700, #ffaa00);
+            color: #1a1a1a;
+        }
+
+        .btn-calculate:hover {
+            background: linear-gradient(145deg, #ffea00, #ffc400);
+            transform: scale(1.05);
+        }
+
+        .btn-clear {
+            background: linear-gradient(145deg, #666, #444);
+            color: white;
+        }
+
+        .btn-clear:hover {
+            background: linear-gradient(145deg, #888, #666);
+        }
+
+        .results {
+            text-align: center;
+            padding: 15px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .win-probability {
+            font-size: 2.5em;
+            color: #ffd700;
+            margin: 10px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .hand-strength {
+            font-size: 1.2em;
+            color: #90EE90;
+            margin-bottom: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .stat-box {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .stat-label {
+            font-size: 0.8em;
+            color: #aaa;
+        }
+
+        .stat-value {
+            font-size: 1.2em;
+            color: #fff;
+            margin-top: 3px;
+        }
+
+        .outs-info {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255,215,0,0.1);
+            border-radius: 8px;
+            font-size: 0.85em;
+        }
+
+        .selection-mode {
+            text-align: center;
+            padding: 6px;
+            background: rgba(255,215,0,0.2);
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        .tab-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .tab-btn {
+            padding: 6px 15px;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid transparent;
+            color: white;
+            border-radius: 15px;
+            font-size: 0.9em;
+        }
+
+        .tab-btn.active {
+            border-color: #ffd700;
+            background: rgba(255,215,0,0.2);
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            width: 18px;
+            height: 18px;
+            background: #d32f2f;
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .instructions {
+            text-align: center;
+            color: #aaa;
+            font-size: 0.8em;
+            margin-bottom: 8px;
+        }
+
+        .results-placeholder {
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        /* Para telas menores */
+        @media (max-width: 1000px) {
+            body {
+                overflow-y: auto;
+            }
+            .main-layout {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            .container {
+                height: auto;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                max-width: 100vw;
+                padding: 0;
+            }
+            .main-layout {
+                display: flex;
+                flex-direction: column;
+                gap: 0;
+            }
+            .left-panel, .right-panel {
+                width: 100vw;
+                min-width: 0;
+                padding: 0 2vw;
+            }
+            .cards-row {
+                flex-direction: column;
+                gap: 4px;
+            }
+            .section {
+                padding: 6px 2vw;
+                border-radius: 8px;
+            }
+            .selected-cards {
+                gap: 4px;
+                min-height: 0;
+            }
+            .card-slot {
+                width: 32px;
+                height: 40px;
+                font-size: 8px;
+            }
+            .card {
+                width: 32px;
+                height: 40px;
+                border-radius: 4px;
+            }
+            .card .rank { font-size: 11px; }
+            .card .suit { font-size: 13px; }
+            .mini-card {
+                width: 22px;
+                height: 28px;
+                font-size: 8px;
+            }
+            .mini-card .rank { font-size: 9px; }
+            .mini-card .suit { font-size: 10px; }
+            .deck-section {
+                padding: 2vw 0;
+                min-height: 0;
+                max-height: 35vh;
+                overflow-y: auto;
+            }
+            .results {
+                padding: 6px 2vw;
+            }
+            .win-probability {
+                font-size: 1.3em;
+                margin: 4px 0;
+            }
+            .hand-strength {
+                font-size: 1em;
+                margin-bottom: 4px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 4px;
+                margin-top: 4px;
+            }
+            .stat-box {
+                padding: 4px;
+                border-radius: 4px;
+            }
+            .outs-info {
+                margin-top: 4px;
+                padding: 4px;
+                border-radius: 4px;
+                font-size: 0.8em;
+            }
+            .tab-buttons {
+                gap: 4px;
+                margin-bottom: 4px;
+            }
+            .tab-btn {
+                padding: 4px 8px;
+                font-size: 0.8em;
+                border-radius: 10px;
+            }
+            .remove-btn {
+                width: 12px;
+                height: 12px;
+                font-size: 8px;
+                top: -4px;
+                right: -4px;
+            }
+            h1 {
+                font-size: 1em;
+                margin-bottom: 4px;
+            }
         }
     </style>
 </head>
-<body class="bg-slate-200 text-slate-800 min-h-screen antialiased overflow-x-hidden">
+<body>
+    <div class="container">
+        <h1>🃏 Calculadora de Poker</h1>
 
-    <div class="container mx-auto p-3 sm:p-4 md:p-6 lg:p-8">
-        
-        <header class="text-center mb-8 w-full">
-            <img src="https://i.postimg.cc/d1qY1zN0/hkk.png" alt="Logo Hokkaido Plastics" class="mx-auto h-20 w-auto mb-4">
-            <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-blue-500">Hokkaido Synchro</h1>
-            <p class="text-lg text-slate-600 font-medium mt-1">Controle de Perdas</p>
-        </header>
-
-        <div class="mb-6 border-b border-slate-300">
-            <nav class="flex space-x-6 overflow-x-auto">
-                <button class="tab-btn py-3 px-1 text-slate-600 hover:text-cyan-600 border-b-2 border-transparent transition-all duration-300 active whitespace-nowrap" data-tab="lancamento">
-                    <i data-lucide="edit-3" class="w-4 h-4 inline-block mr-2"></i>Lançamento
-                </button>
-                <button class="tab-btn py-3 px-1 text-slate-600 hover:text-cyan-600 border-b-2 border-transparent transition-all duration-300 whitespace-nowrap" data-tab="dashboard">
-                    <i data-lucide="layout-dashboard" class="w-4 h-4 inline-block mr-2"></i>Dashboard
-                </button>
-                <button class="tab-btn py-3 px-1 text-slate-600 hover:text-cyan-600 border-b-2 border-transparent transition-all duration-300 whitespace-nowrap" data-tab="verificacao">
-                    <i data-lucide="check-square" class="w-4 h-4 inline-block mr-2"></i>Verificação de Dados
-                </button>
-            </nav>
+        <!-- Seleção de Modo -->
+        <div class="tab-buttons">
+            <button class="tab-btn active" data-mode="hand" onclick="setSelectionMode('hand')">Minha Mão</button>
+            <button class="tab-btn" data-mode="board" onclick="setSelectionMode('board')">Mesa (Board)</button>
         </div>
 
-        <div id="tab-content">
-            <div id="lancamento-tab" class="tab-pane active fade-in">
-                <main class="w-full max-w-2xl mx-auto bg-white p-6 md:p-8 rounded-lg shadow-lg border-t-4 border-cyan-500">
-                    <h2 class="text-2xl font-bold mb-4 flex items-center gap-2 text-slate-800 border-b-2 border-slate-100 pb-3"><i data-lucide="edit-3" class="text-cyan-600"></i>Lançamento de Turno</h2>
-                    <form id="production-form" class="space-y-5 pt-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
-                            <div>
-                                <label for="operador" class="block text-sm font-medium text-slate-700">Operador</label>
-                                <input type="number" id="operador" name="operador" required placeholder="Ex: 12345" class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
-                            </div>
-                            <div>
-                                <label for="maquina" class="block text-sm font-medium text-slate-700">Máquina</label>
-                                <select id="maquina" name="maquina" required class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 transition" disabled>
-                                    <option value="">A carregar máquinas do plano...</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="turno" class="block text-sm font-medium text-slate-700">Turno</label>
-                                <select id="turno" name="turno" required class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
-                                    <option value="1">1º Turno</option>
-                                    <option value="2">2º Turno</option>
-                                    <option value="3">3º Turno</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="op" class="block text-sm font-medium text-slate-700">Produto</label>
-                                <input type="text" id="op" name="produto" required placeholder="Preenchido automaticamente" class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 transition bg-slate-50" readonly>
-                            </div>
-                            <div>
-                                <label for="produzido" class="block text-sm font-medium text-slate-700">Produção</label>
-                                <input type="number" id="produzido" name="produzido" min="0" required class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
-                            </div>
-                             <div>
-                                <label for="triagem" class="block text-sm font-medium text-slate-700">Peças para Triagem</label>
-                                <input type="number" id="triagem" name="triagem" min="0" required value="0" class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
-                            </div>
-                             <div>
-                                <label for="refugo" class="block text-sm font-medium text-slate-700">Refugo (kg)</label>
-                                <input type="number" id="refugo" name="refugo" min="0" step="0.01" required value="0" class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
-                            </div>
-                            <div>
-                                <label for="borras" class="block text-sm font-medium text-slate-700">Peso das Borras (kg)</label>
-                                <input type="number" id="borras" name="borras" min="0" step="0.01" required value="0" class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
-                            </div>
-                            <div class="md:col-span-2">
-                                <label for="perdas" class="block text-sm font-medium text-slate-700">Perdas (Motivo do Refugo)</label>
-                                <select id="perdas" name="perdas" required class="mt-1 block w-full p-2 border-slate-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
-                                    <option value="N/A">Não se aplica / Sem refugo</option>
-                                    <option value="BOLHA">BOLHA</option><option value="CHUPAGEM">CHUPAGEM</option><option value="CONTAMINAÇÃO">CONTAMINAÇÃO</option><option value="DEGRADAÇÃO">DEGRADAÇÃO</option><option value="DEFORMAÇÃO">DEFORMAÇÃO</option><option value="EMPENAMENTO">EMPENAMENTO</option><option value="FALHA">FALHA</option><option value="FIAPO">FIAPO</option><option value="FORA DE COR">FORA DE COR</option><option value="GALHO PRESO">GALHO PRESO</option><option value="INÍCIO/ REÍNICIO">INÍCIO/ REÍNICIO</option><option value="JUNÇÃO">JUNÇÃO</option><option value="MANCHAS">MANCHAS</option><option value="MARCA D'ÁGUA">MARCA D'ÁGUA</option><option value="MARCA EXTRATOR">MARCA EXTRATOR</option><option value="MEDIDA FORA DO ESPECIFICADO">MEDIDA FORA DO ESPECIFICADO</option><option value="MOÍDO">MOÍDO</option><option value="PEÇAS PERDIDAS">PEÇAS PERDIDAS</option><option value="QUEIMA">QUEIMA</option><option value="REBARBA">REBARBA</option><option value="RISCOS">RISCOS</option><option value="SUJIDADE">SUJIDADE</option>
-                                </select>
-                            </div>
+        <div class="main-layout">
+            <div class="left-panel">
+                <!-- Mão e Mesa lado a lado -->
+                <div class="cards-row">
+                    <div class="section hand-section">
+                        <h2>🎴 Minha Mão</h2>
+                        <div class="selected-cards" id="hand-cards">
+                            <div class="card-slot">1</div>
+                            <div class="card-slot">2</div>
                         </div>
-                        <hr class="border-slate-200 my-4">
-                        <div class="flex flex-col items-center gap-4">
-                            <button type="submit" id="submit-button" class="w-full md:w-auto bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 px-8 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:bg-slate-400 disabled:cursor-not-allowed shadow-sm hover:shadow-md">
-                                <i data-lucide="send" class="w-5 h-5"></i>
-                                <span>Enviar Lançamento</span>
-                            </button>
-                            <div id="status-message" class="text-sm font-semibold h-5 text-center"></div>
-                        </div>
-                    </form>
-                </main>
-            </div>
+                    </div>
 
-            <div id="dashboard-tab" class="tab-pane" style="display: none;">
-                 <div class="mb-6 flex flex-col xl:flex-row items-center justify-between gap-4 bg-white p-4 rounded-lg shadow-md">
-                    <div class="w-full flex flex-col md:flex-row items-center gap-4">
-                        <div class="flex-1 flex items-center gap-2">
-                            <label for="start-date-selector" class="font-semibold text-slate-700 text-sm md:text-base whitespace-nowrap">De:</label>
-                            <input type="date" id="start-date-selector" class="w-full border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 transition">
-                        </div>
-                        <div class="flex-1 flex items-center gap-2">
-                             <label for="end-date-selector" class="font-semibold text-slate-700 text-sm md:text-base whitespace-nowrap">Até:</label>
-                            <input type="date" id="end-date-selector" class="w-full border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 transition">
-                        </div>
-                         <div class="flex-1 flex items-center gap-2">
-                             <label for="machine-filter" class="font-semibold text-slate-700 text-sm md:text-base whitespace-nowrap">Máquina:</label>
-                            <select id="machine-filter" class="w-full border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 transition">
-                                <option value="total">Visão Geral (Total)</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button id="refresh-dashboard-btn" class="w-full xl:w-auto bg-cyan-600 hover:bg-cyan-700 text-white font-bold p-2 px-6 rounded-lg transition-colors flex items-center justify-center gap-2" title="Atualizar dados do dashboard">
-                        <i data-lucide="search" class="w-5 h-5"></i>
-                        <span>Filtrar</span>
-                    </button>
-                </div>
-                <div id="dashboard-content" class="space-y-6" style="display: none;">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div class="bg-white p-5 rounded-lg shadow-lg flex items-center gap-4">
-                            <div class="p-3 bg-blue-100 rounded-full"><i data-lucide="package" class="w-7 h-7 text-blue-600"></i></div>
-                            <div>
-                                <p class="text-sm text-slate-500">Produção Total</p>
-                                <p id="kpi-producao" class="text-2xl font-bold">...</p>
-                            </div>
-                        </div>
-                         <div id="refugo-card" class="kpi-card-interactive bg-white p-5 rounded-lg shadow-lg flex items-center justify-between gap-4">
-                            <div class="flex items-center gap-4">
-                                <div class="p-3 bg-red-100 rounded-full"><i data-lucide="trash-2" class="w-7 h-7 text-red-600"></i></div>
-                                <div>
-                                    <p id="kpi-refugo-label" class="text-sm text-slate-500">Refugo Total (kg)</p>
-                                    <p id="kpi-refugo" class="text-2xl font-bold">...</p>
-                                </div>
-                            </div>
-                            <i data-lucide="repeat" class="w-5 h-5 text-slate-400"></i>
-                        </div>
-                        <div class="bg-white p-5 rounded-lg shadow-lg flex items-center gap-4">
-                            <div class="p-3 bg-purple-100 rounded-full"><i data-lucide="clipboard-check" class="w-7 h-7 text-purple-600"></i></div>
-                            <div>
-                                <p class="text-sm text-slate-500">Total para Triagem</p>
-                                <p id="kpi-triagem" class="text-2xl font-bold">...</p>
-                            </div>
-                        </div>
-                        <div class="bg-white p-5 rounded-lg shadow-lg flex items-center gap-4">
-                            <div class="p-3 bg-green-100 rounded-full"><i data-lucide="recycle" class="w-7 h-7 text-green-600"></i></div>
-                            <div>
-                                <p class="text-sm text-slate-500">Borras (kg)</p>
-                                <p id="kpi-borras" class="text-2xl font-bold">...</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-red-500 relative">
-                            <div class="flex justify-between items-start">
-                                <h2 id="pareto-title" class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-800 border-b-2 border-slate-100 pb-3"><i data-lucide="bar-chart-3" class="text-red-500"></i>Principais Motivos de Perdas</h2>
-                                <div class="flex items-center rounded-md bg-slate-100 p-1 text-sm">
-                                    <button id="pareto-refugo-btn" class="pareto-toggle px-3 py-1 rounded-md transition-colors active">Refugo</button>
-                                    <button id="pareto-borras-btn" class="pareto-toggle px-3 py-1 rounded-md transition-colors">Borras</button>
-                                </div>
-                            </div>
-                            <canvas id="paretoChart"></canvas>
-                        </div>
-                        <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-blue-500 relative">
-                            <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-800 border-b-2 border-slate-100 pb-3"><i data-lucide="bar-chart-horizontal" class="text-blue-500"></i>Análise de Perdas por Turno (kg)</h2>
-                             <canvas id="turnoChart"></canvas>
+                    <div class="section board-section">
+                        <h2>🎯 Mesa (Board)</h2>
+                        <div class="selected-cards" id="board-cards">
+                            <div class="card-slot">F</div>
+                            <div class="card-slot">F</div>
+                            <div class="card-slot">F</div>
+                            <div class="card-slot">T</div>
+                            <div class="card-slot">R</div>
                         </div>
                     </div>
                 </div>
-                 <div id="dashboard-loading" class="text-center py-10" style="display: none;">
-                    <i data-lucide="loader-2" class="w-12 h-12 animate-spin text-cyan-600 mx-auto"></i>
-                    <p class="mt-4 text-slate-600">A carregar dados do dashboard...</p>
+
+                <!-- Deck -->
+                <div class="section deck-section">
+                    <p class="selection-mode" id="mode-indicator">Selecionando: <strong>Minha Mão</strong></p>
+                    <div id="deck"></div>
                 </div>
-                 <div id="dashboard-error" class="hidden text-center py-10 bg-red-50 border border-red-200 rounded-lg">
-                    <i data-lucide="alert-triangle" class="w-12 h-12 text-red-500 mx-auto"></i>
-                    <p class="mt-4 font-semibold text-red-700">Não foi possível carregar os dados.</p>
-                    <p id="dashboard-error-details" class="text-sm text-red-600"></p>
+
+                <!-- Botões -->
+                <div class="buttons">
+                    <button class="btn-clear" onclick="clearAll()">🗑️ Limpar Tudo</button>
                 </div>
             </div>
 
-            <div id="verificacao-tab" class="tab-pane" style="display: none;">
-                <div class="mb-6 flex flex-col md:flex-row items-center justify-between gap-4 bg-white p-4 rounded-lg shadow-md">
-                     <h2 class="text-xl font-bold text-slate-800 whitespace-nowrap">Verificar e Excluir Lançamentos</h2>
-                     <div class="w-full flex flex-col md:flex-row items-center gap-4">
-                        <div class="flex-1 flex items-center gap-2">
-                             <label for="verificacao-date-selector" class="font-semibold text-slate-700 text-sm md:text-base whitespace-nowrap">Data:</label>
-                             <input type="date" id="verificacao-date-selector" class="w-full border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 transition">
-                        </div>
-                         <button id="refresh-verificacao-btn" class="w-full md:w-auto bg-cyan-600 hover:bg-cyan-700 text-white font-bold p-2 px-6 rounded-lg transition-colors flex items-center justify-center gap-2" title="Buscar lançamentos">
-                            <i data-lucide="search" class="w-5 h-5"></i>
-                            <span>Buscar</span>
-                        </button>
-                     </div>
-                </div>
-                <div id="verificacao-content" class="bg-white p-6 rounded-lg shadow-lg">
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-slate-200">
-                            <thead class="bg-slate-50">
-                                <tr>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Data/Hora</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Operador</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Máquina</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Produto</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Qtd.</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Refugo (kg)</th>
-                                    <th class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">Ação</th>
-                                </tr>
-                            </thead>
-                            <tbody id="verificacao-table-body" class="bg-white divide-y divide-slate-200"></tbody>
-                        </table>
-                    </div>
-                     <div id="verificacao-loading" class="text-center py-10" style="display: none;">
-                        <i data-lucide="loader-2" class="w-12 h-12 animate-spin text-cyan-600 mx-auto"></i>
-                    </div>
-                    <div id="verificacao-no-data" class="text-center py-10 text-slate-500" style="display: none;">
-                        <p>Nenhum lançamento encontrado para a data selecionada.</p>
+            <div class="right-panel">
+                <!-- Resultados -->
+                <div class="section results" id="results">
+                    <h2>📈 Resultados</h2>
+                    <div id="results-content">
+                        <p class="results-placeholder">Selecione 2 cartas para sua mão</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    
-    <div id="confirm-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 z-50 flex justify-center items-center p-4">
-         <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm m-4 text-center">
-            <div class="flex justify-center mb-4">
-                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                    <i data-lucide="alert-triangle" class="w-8 h-8 text-red-500"></i>
-                </div>
-            </div>
-            <h3 class="text-lg font-bold">Confirmar Exclusão</h3>
-            <p class="text-sm text-slate-600 my-2" id="confirm-modal-text">Tem a certeza de que deseja excluir este lançamento? Esta ação não pode ser desfeita.</p>
-            <div class="mt-6 flex justify-center gap-3">
-                <button id="confirm-modal-cancel-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-4 rounded-lg">Cancelar</button>
-                <button id="confirm-modal-ok-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg">Excluir</button>
-            </div>
-        </div>
-    </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, query, where, Timestamp, doc, deleteDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyDJR5gs6yHGnkeYVknnV8wWNodrHPZmAYs",
-            authDomain: "hokkaido-controle-producao.firebaseapp.com",
-            projectId: "hokkaido-controle-producao",
-            storageBucket: "hokkaido-controle-producao.appspot.com",
-            messagingSenderId: "436420480433",
-            appId: "1:436420480433:web:f2386beaa50a81cf3f4190"
-        };
-        
-        const SUPABASE_URL = 'https://hrukbkrzmabdrjyvpmff.supabase.co'; 
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhydWtia3J6bWFiZHJqeXZwbWZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MzI3OTEsImV4cCI6MjA3NTAwODc5MX0.Auiqvoq-w8EKLvc-KVysAk697uI2o-lEK8zh2cU7LKI';
-
-        let db;
-        try {
-            const app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-        } catch (error) {
-            console.error("Erro ao inicializar Firebase:", error);
-            alert("Erro fatal: Não foi possível conectar à base de dados.");
-        }
-
-        function getProductionDateString() {
-            const now = new Date();
-            const currentHour = now.getHours();
-            if (currentHour < 7) { 
-                now.setDate(now.getDate() - 1);
-            }
-            const offset = now.getTimezoneOffset();
-            return new Date(now.getTime() - (offset * 60 * 1000)).toISOString().split('T')[0];
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- VARIÁVEIS GLOBAIS DO SCRIPT ---
-            let plannedMachinesData = [];
-            let fullDashboardData = [];
-            let currentParetoMode = 'refugo';
-            let paretoChartInstance = null;
-            let turnoChartInstance = null;
-            let pieceWeightMap = new Map();
-            let kpiValues = {};
-            let refugoViewMode = 'kg';
-
-            // --- SELETORES DE DOM ---
-            const machineSelect = document.getElementById('maquina');
-            const opInput = document.getElementById('op');
-            const form = document.getElementById('production-form');
-            const tabButtons = document.querySelectorAll('.tab-btn');
-            const tabPanes = document.querySelectorAll('.tab-pane');
-            const startDateSelector = document.getElementById('start-date-selector');
-            const endDateSelector = document.getElementById('end-date-selector');
-            const machineFilter = document.getElementById('machine-filter');
-            const refreshDashboardBtn = document.getElementById('refresh-dashboard-btn');
-            const paretoRefugoBtn = document.getElementById('pareto-refugo-btn');
-            const paretoBorrasBtn = document.getElementById('pareto-borras-btn');
-            const verificacaoDateSelector = document.getElementById('verificacao-date-selector');
-            const refreshVerificacaoBtn = document.getElementById('refresh-verificacao-btn');
-            const verificacaoTableBody = document.getElementById('verificacao-table-body');
-            const refugoCard = document.getElementById('refugo-card');
-
-            // --- FUNÇÕES DE LÓGICA PRINCIPAL ---
-            const init = () => {
-                lucide.createIcons();
-                setTodayDate();
-                fetchPlannedMachines();
-                setupEventListeners();
-            };
-
-            const setupEventListeners = () => {
-                if (machineSelect) machineSelect.addEventListener('change', onMachineSelectChange);
-                if (form) form.addEventListener('submit', handleFormSubmit);
-                if (tabButtons) tabButtons.forEach(button => button.addEventListener('click', handleTabClick));
-                if (refreshDashboardBtn) refreshDashboardBtn.addEventListener('click', loadDashboardData);
-                if (machineFilter) machineFilter.addEventListener('change', () => processAndRenderDashboard(fullDashboardData));
-                if (paretoRefugoBtn) paretoRefugoBtn.addEventListener('click', () => setParetoMode('refugo'));
-                if (paretoBorrasBtn) paretoBorrasBtn.addEventListener('click', () => setParetoMode('borras'));
-                if (refugoCard) refugoCard.addEventListener('click', toggleRefugoView);
-                if (refreshVerificacaoBtn) refreshVerificacaoBtn.addEventListener('click', loadVerificacaoData);
-                if (verificacaoTableBody) verificacaoTableBody.addEventListener('click', handleVerificacaoTableClick);
-                
-                const confirmModal = document.getElementById('confirm-modal');
-                if(confirmModal) {
-                    document.getElementById('confirm-modal-cancel-btn').addEventListener('click', hideConfirmModal);
-                    document.getElementById('confirm-modal-ok-btn').addEventListener('click', executeDelete);
-                }
-            };
-
-            // --- FUNÇÕES DE EVENTOS ---
-            const onMachineSelectChange = () => {
-                const selectedMachine = machineSelect.value;
-                const machinePlan = plannedMachinesData.find(plan => plan.machine === selectedMachine);
-                opInput.value = machinePlan ? machinePlan.product || '' : '';
-            };
-
-            const handleFormSubmit = async (e) => {
-                e.preventDefault();
-                const submitButton = document.getElementById('submit-button');
-                const buttonText = submitButton.querySelector('span');
-                const statusMessage = document.getElementById('status-message');
-                submitButton.disabled = true;
-                buttonText.textContent = 'A enviar...';
-                statusMessage.textContent = '';
-                const formData = new FormData(form);
-                const dataToSave = {
-                    operador: formData.get('operador'), maquina: formData.get('maquina'), turno: formData.get('turno'),
-                    produto: formData.get('produto'), produzido: Number(formData.get('produzido')), triagem: Number(formData.get('triagem')),
-                    refugo: Number(formData.get('refugo')), borras: Number(formData.get('borras')), perdas: formData.get('perdas'),
-                    timestamp: Timestamp.now()
-                };
-                try {
-                    await addDoc(collection(db, "perdas"), dataToSave);
-                    statusMessage.textContent = 'Lançamento salvo com sucesso!';
-                    statusMessage.className = 'text-sm font-semibold h-5 text-center text-green-600 fade-in-out';
-                    form.reset();
-                    opInput.value = '';
-                    machineSelect.value = '';
-                } catch (error) {
-                    console.error('Erro ao salvar no Firebase:', error);
-                    statusMessage.textContent = `Erro ao salvar: ${error.message}`;
-                    statusMessage.className = 'text-sm font-semibold h-5 text-center text-red-600';
-                } finally {
-                    setTimeout(() => {
-                        submitButton.disabled = false;
-                        buttonText.textContent = 'Enviar Lançamento';
-                        if (!statusMessage.classList.contains('text-red-600')) {
-                             setTimeout(() => { statusMessage.textContent = ''; }, 4000);
-                        }
-                    }, 500);
-                }
-            };
-
-            const handleTabClick = (e) => {
-                const tabId = e.currentTarget.dataset.tab;
-                tabButtons.forEach(btn => btn.classList.remove('active'));
-                e.currentTarget.classList.add('active');
-                tabPanes.forEach(pane => {
-                    pane.style.display = pane.id === `${tabId}-tab` ? 'block' : 'none';
-                });
-                if (tabId === 'dashboard') loadDashboardData();
-                if (tabId === 'verificacao') loadVerificacaoData();
-            };
-
-            const setParetoMode = (mode) => {
-                currentParetoMode = mode;
-                paretoRefugoBtn.classList.toggle('active', mode === 'refugo');
-                paretoBorrasBtn.classList.toggle('active', mode === 'borras');
-                processAndRenderDashboard(fullDashboardData);
-            };
-
-            const toggleRefugoView = () => {
-                refugoViewMode = refugoViewMode === 'kg' ? 'pcs' : 'kg';
-                updateRefugoCard();
-            };
-
-            const handleVerificacaoTableClick = (e) => {
-                const deleteBtn = e.target.closest('.delete-btn');
-                if (deleteBtn) {
-                    showConfirmModal(deleteBtn.dataset.id);
-                }
-            };
-
-            // --- FUNÇÕES DE DADOS E API ---
-            async function fetchPlannedMachines() {
-                machineSelect.innerHTML = `<option value="">A carregar máquinas...</option>`;
-                machineSelect.disabled = true;
-                const productionDay = getProductionDateString();
-                const url = `${SUPABASE_URL}/rest/v1/production_plan?select=machine,product,piece_weight&date=eq.${productionDay}`;
-                try {
-                    const response = await fetch(url, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
-                    if (!response.ok) throw new Error(`Erro na rede: ${response.statusText}`);
-                    const data = await response.json();
-                    plannedMachinesData = data;
-                    populateMachineSelect(plannedMachinesData);
-                } catch (error) {
-                    console.error('Erro ao buscar máquinas planeadas:', error);
-                    machineSelect.innerHTML = `<option value="">Erro ao carregar</option>`;
-                    alert(`Não foi possível carregar o planeamento: ${error.message}`);
-                } finally {
-                    machineSelect.disabled = false;
-                }
-            }
-
-            async function loadDashboardData() {
-                const dashboardContent = document.getElementById('dashboard-content');
-                const dashboardLoading = document.getElementById('dashboard-loading');
-                const dashboardError = document.getElementById('dashboard-error');
-                const dashboardErrorDetails = document.getElementById('dashboard-error-details');
-                const startDateStr = startDateSelector.value;
-                const endDateStr = endDateSelector.value;
-                if (!startDateStr || !endDateStr || new Date(startDateStr) > new Date(endDateStr)) {
-                    alert("Por favor, selecione um período de datas válido."); return;
-                }
-                dashboardContent.style.display = 'none';
-                dashboardError.style.display = 'none';
-                dashboardLoading.style.display = 'block';
-                try {
-                    const startDate = new Date(startDateStr + 'T07:00:00');
-                    const endDate = new Date(endDateStr + 'T07:00:00');
-                    endDate.setDate(endDate.getDate() + 1);
-                    const q = query(collection(db, "perdas"), where("timestamp", ">=", Timestamp.fromDate(startDate)), where("timestamp", "<", Timestamp.fromDate(endDate)));
-                    const querySnapshot = await getDocs(q);
-                    
-                    const url = `${SUPABASE_URL}/rest/v1/production_plan?select=product,piece_weight&date=gte.${startDateStr}&date=lte.${endDateStr}`;
-                    const response = await fetch(url, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
-                    if (!response.ok) throw new Error(`Erro na rede ao buscar pesos: ${response.statusText}`);
-                    const weightsData = await response.json();
-                    pieceWeightMap.clear();
-                    weightsData.forEach(item => { if (item.product && item.piece_weight) { pieceWeightMap.set(item.product, item.piece_weight); }});
-                    
-                    fullDashboardData = [];
-                    querySnapshot.forEach((doc) => { fullDashboardData.push(doc.data()); });
-                    populateMachineFilter(fullDashboardData);
-                    processAndRenderDashboard(fullDashboardData);
-                    dashboardContent.style.display = 'block';
-                } catch (error) {
-                    console.error("Falha ao carregar dados do dashboard:", error);
-                    dashboardErrorDetails.textContent = error.message;
-                    dashboardError.style.display = 'block';
-                } finally {
-                    dashboardLoading.style.display = 'none';
-                }
-            }
-            
-            async function loadVerificacaoData() {
-                const dateStr = verificacaoDateSelector.value;
-                if (!dateStr) return;
-                const loading = document.getElementById('verificacao-loading');
-                const noData = document.getElementById('verificacao-no-data');
-                loading.style.display = 'block';
-                noData.style.display = 'none';
-                verificacaoTableBody.innerHTML = '';
-                try {
-                    const startDate = new Date(dateStr + 'T07:00:00');
-                    const endDate = new Date(dateStr + 'T07:00:00');
-                    endDate.setDate(endDate.getDate() + 1);
-                    const q = query(collection(db, "perdas"), where("timestamp", ">=", Timestamp.fromDate(startDate)), where("timestamp", "<", Timestamp.fromDate(endDate)), orderBy("timestamp", "desc"));
-                    const querySnapshot = await getDocs(q);
-                    if (querySnapshot.empty) {
-                        noData.style.display = 'block';
-                    } else {
-                        querySnapshot.forEach(doc => renderVerificacaoRow({ id: doc.id, ...doc.data() }));
-                    }
-                } catch (error) {
-                    console.error("Erro ao buscar dados para verificação:", error);
-                    alert("Não foi possível carregar os lançamentos.");
-                } finally {
-                    loading.style.display = 'none';
-                }
-            }
-
-            // --- FUNÇÕES DE RENDERIZAÇÃO E UI ---
-            function populateMachineSelect(machines) {
-                if (!machines || machines.length === 0) {
-                    machineSelect.innerHTML = '<option value="">Nenhuma máquina no plano de hoje</option>'; return;
-                }
-                machineSelect.innerHTML = '<option value="">Selecione uma Máquina</option>';
-                const uniqueMachines = [...new Set(machines.map(item => item.machine))].sort((a, b) => parseInt(a.split('-')[1]) - parseInt(b.split('-')[1]));
-                uniqueMachines.forEach(machine => {
-                    const option = document.createElement('option');
-                    option.value = machine;
-                    option.textContent = machine;
-                    machineSelect.appendChild(option);
-                });
-            }
-
-            function populateMachineFilter(data) {
-                const currentVal = machineFilter.value;
-                const machines = [...new Set(data.map(item => item.maquina))].sort();
-                machineFilter.innerHTML = '<option value="total">Visão Geral (Total)</option>';
-                machines.forEach(machine => {
-                    const option = document.createElement('option');
-                    option.value = machine;
-                    option.textContent = machine;
-                    machineFilter.appendChild(option);
-                });
-                if (machines.includes(currentVal)) { machineFilter.value = currentVal; }
-            }
-             
-            function processAndRenderDashboard(data) {
-                const selectedMachine = machineFilter.value;
-                const filteredData = selectedMachine === 'total' ? data : data.filter(row => row.maquina === selectedMachine);
-                
-                const noDataMessage = (ctx) => {
-                    if (!ctx) return;
-                    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-                    ctx.save();
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillStyle = '#64748b';
-                    ctx.font = "14px 'Inter', sans-serif";
-                    ctx.fillText('Sem dados para a seleção atual.', ctx.canvas.width / 2, ctx.canvas.height / 2);
-                    ctx.restore();
-                };
-
-                if (!filteredData || filteredData.length === 0) {
-                    kpiValues = { producao: 0, refugoKg: 0, refugoPcs: 0, triagem: 0, borras: 0 };
-                    updateKpiCards();
-                    if (paretoChartInstance) paretoChartInstance.destroy();
-                    if (turnoChartInstance) turnoChartInstance.destroy();
-                    noDataMessage(document.getElementById('paretoChart')?.getContext('2d'));
-                    noDataMessage(document.getElementById('turnoChart')?.getContext('2d'));
-                    return;
-                }
-                const totalProduzido = filteredData.reduce((sum, row) => sum + Number(row.produzido || 0), 0);
-                const totalRefugoKg = filteredData.reduce((sum, row) => sum + Number(row.refugo || 0), 0);
-                const totalTriagem = filteredData.reduce((sum, row) => sum + Number(row.triagem || 0), 0);
-                const totalBorras = filteredData.reduce((sum, row) => sum + Number(row.borras || 0), 0);
-                const totalRefugoPcs = filteredData.reduce((sum, row) => {
-                    const weight = pieceWeightMap.get(row.produto);
-                    if (weight && weight > 0 && row.refugo > 0) {
-                        return sum + ((row.refugo * 1000) / weight);
-                    }
-                    return sum;
-                }, 0);
-                
-                kpiValues = { producao: totalProduzido, refugoKg: totalRefugoKg, refugoPcs: totalRefugoPcs, triagem: totalTriagem, borras: totalBorras };
-                updateKpiCards();
-
-                if (currentParetoMode === 'refugo') {
-                    document.getElementById('pareto-title').innerHTML = `<i data-lucide="bar-chart-3" class="text-red-500"></i>Principais Motivos de Perdas`;
-                    const refugoPorMotivo = filteredData.reduce((acc, row) => {
-                        const motivo = row.perdas;
-                        const refugo = Number(row.refugo || 0);
-                        if (motivo && motivo !== 'N/A' && refugo > 0) { acc[motivo] = (acc[motivo] || 0) + refugo; }
-                        return acc;
-                    }, {});
-                    const sortedRefugo = Object.entries(refugoPorMotivo).sort(([, a], [, b]) => b - a);
-                    renderParetoChart(sortedRefugo, 'Refugo (kg)', 'rgba(239, 68, 68, 0.7)');
-                } else { 
-                    document.getElementById('pareto-title').innerHTML = `<i data-lucide="bar-chart-3" class="text-green-500"></i>Maiores Geradores de Borras`;
-                    const borrasPorMaquina = (selectedMachine === 'total' ? data : [data.find(row => row.maquina === selectedMachine)].filter(Boolean))
-                        .reduce((acc, row) => {
-                            const maquina = row.maquina;
-                            const borras = Number(row.borras || 0);
-                            if (maquina && borras > 0) { acc[maquina] = (acc[maquina] || 0) + borras; }
-                            return acc;
-                        }, {});
-                    const sortedBorras = Object.entries(borrasPorMaquina).sort(([, a], [, b]) => b - a);
-                    renderParetoChart(sortedBorras, 'Borras (kg)', 'rgba(34, 197, 94, 0.7)');
-                }
-                
-                const perdasPorTurno = filteredData.reduce((acc, row) => {
-                    const turno = `${row.turno}º Turno`;
-                    if(acc[turno]) {
-                       acc[turno].refugo += Number(row.refugo || 0);
-                       acc[turno].borras += Number(row.borras || 0);
-                    }
-                    return acc;
-                }, { "1º Turno": {refugo: 0, borras: 0}, "2º Turno": {refugo: 0, borras: 0}, "3º Turno": {refugo: 0, borras: 0} });
-                
-                renderTurnoChart(perdasPorTurno);
-                lucide.createIcons();
-            }
-
-            function updateKpiCards() {
-                document.getElementById('kpi-producao').textContent = (kpiValues.producao || 0).toLocaleString('pt-BR');
-                document.getElementById('kpi-triagem').textContent = (kpiValues.triagem || 0).toLocaleString('pt-BR');
-                document.getElementById('kpi-borras').textContent = `${(kpiValues.borras || 0).toFixed(2)} kg`;
-                updateRefugoCard();
-            }
-
-            function updateRefugoCard() {
-                const label = document.getElementById('kpi-refugo-label');
-                const value = document.getElementById('kpi-refugo');
-                if (refugoViewMode === 'kg') {
-                    label.textContent = 'Refugo Total (kg)';
-                    value.textContent = `${(kpiValues.refugoKg || 0).toFixed(2)} kg`;
-                } else {
-                    label.textContent = 'Refugo Total (pçs)';
-                    value.textContent = `${Math.round(kpiValues.refugoPcs || 0).toLocaleString('pt-BR')} pçs`;
-                }
-            }
-
-            function renderParetoChart(data, label, color) {
-                const ctx = document.getElementById('paretoChart').getContext('2d');
-                if (paretoChartInstance) paretoChartInstance.destroy();
-                paretoChartInstance = new Chart(ctx, { type: 'bar', data: { labels: data.map(item => item[0]), datasets: [{ label: label, data: data.map(item => item[1]), backgroundColor: color, borderColor: color.replace('0.7', '1'), borderWidth: 1, borderRadius: 4, }] }, options: { scales: { y: { beginAtZero: true } } } });
-            }
-            function renderTurnoChart(data) {
-                const ctx = document.getElementById('turnoChart').getContext('2d');
-                if (turnoChartInstance) turnoChartInstance.destroy();
-                turnoChartInstance = new Chart(ctx, { type: 'bar', data: { labels: Object.keys(data).sort(), datasets: [{ label: 'Refugo (kg)', data: Object.keys(data).sort().map(turno => data[turno].refugo), backgroundColor: 'rgba(239, 68, 68, 0.7)', borderColor: 'rgba(239, 68, 68, 1)', borderWidth: 1, borderRadius: 4, }, { label: 'Borras (kg)', data: Object.keys(data).sort().map(turno => data[turno].borras), backgroundColor: 'rgba(34, 197, 94, 0.7)', borderColor: 'rgba(34, 197, 94, 1)', borderWidth: 1, borderRadius: 4, }] }, options: { scales: { x: { stacked: false }, y: { stacked: false, beginAtZero: true } }, responsive: true, maintainAspectRatio: true } });
-            }
-            
-            function renderVerificacaoRow(data) {
-                const row = document.createElement('tr');
-                row.className = 'hover:bg-slate-50';
-                const timestamp = data.timestamp.toDate();
-                const formattedDate = timestamp.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-                row.innerHTML = `
-                    <td class="px-4 py-3 text-sm text-slate-700">${formattedDate}</td>
-                    <td class="px-4 py-3 text-sm text-slate-700">${data.operador}</td>
-                    <td class="px-4 py-3 text-sm text-slate-700">${data.maquina}</td>
-                    <td class="px-4 py-3 text-sm text-slate-700 truncate" title="${data.produto}">${data.produto}</td>
-                    <td class="px-4 py-3 text-sm text-slate-700">${data.produzido}</td>
-                    <td class="px-4 py-3 text-sm text-slate-700">${data.refugo}</td>
-                    <td class="px-4 py-3 text-center">
-                        <button data-id="${data.id}" class="delete-btn text-red-500 hover:text-red-700 p-1 rounded-md hover:bg-red-100">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                        </button>
-                    </td>
-                `;
-                verificacaoTableBody.appendChild(row);
-                lucide.createIcons();
-            }
-
-            let docIdToDelete = null;
-            const confirmModal = document.getElementById('confirm-modal');
-            const showConfirmModal = (id) => {
-                docIdToDelete = id;
-                confirmModal.classList.remove('hidden');
-            };
-            const hideConfirmModal = () => {
-                confirmModal.classList.add('hidden');
-                docIdToDelete = null;
-            };
-            const executeDelete = async () => {
-                if (!docIdToDelete) return;
-                try {
-                    await deleteDoc(doc(db, "perdas", docIdToDelete));
-                    alert("Lançamento excluído com sucesso!");
-                    loadVerificacaoData();
-                } catch (error) {
-                    console.error("Erro ao excluir documento:", error);
-                    alert(`Não foi possível excluir o lançamento: ${error.message}`);
-                } finally {
-                    hideConfirmModal();
-                }
-            };
-            
-            const setTodayDate = () => {
-                const todayString = getProductionDateString();
-                startDateSelector.value = todayString;
-                endDateSelector.value = todayString;
-                verificacaoDateSelector.value = todayString;
-            };
-            
-            // --- INICIALIZAÇÃO ---
-            init();
-        });
-    </script>
+    <script src="poker.js"></script>
 </body>
 </html>
-
