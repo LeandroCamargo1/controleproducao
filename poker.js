@@ -71,7 +71,6 @@ function selectCard(cardId, rank, suit) {
         if (handCards.length < 2) {
             handCards.push({ id: cardId, rank, suit });
             if (handCards.length === 2) {
-                // Troca para mesa automaticamente
                 setSelectionMode('board');
             }
         }
@@ -80,7 +79,8 @@ function selectCard(cardId, rank, suit) {
             boardCards.push({ id: cardId, rank, suit });
         }
     }
-    updateDisplay();
+    // Força update imediato
+    window.requestAnimationFrame(() => updateDisplay());
 }
 
 // Verifica se uma carta está selecionada
@@ -92,12 +92,11 @@ function isCardSelected(cardId) {
 function removeCard(type, index) {
     if (type === 'hand') {
         handCards.splice(index, 1);
-        // Se remover carta da mão, volta para modo mão
         setSelectionMode('hand');
     } else {
         boardCards.splice(index, 1);
     }
-    updateDisplay();
+    window.requestAnimationFrame(() => updateDisplay());
 }
 
 // Atualiza a exibição
